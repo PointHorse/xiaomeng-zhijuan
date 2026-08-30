@@ -9,6 +9,7 @@ import { SettingsView, autoDetectLocal } from './settings/SettingsView';
 import { applyTheme, applyTypography, watchSystemTheme } from './settings/theme';
 import { initSchema, scheduleSave, loadStoryTree, listStories, writeExportFile, saveSettingsJson, loadSettingsJson } from './store/persist';
 import { buildJsonExport, buildTxtExport } from './export/exporters';
+import { buildMdExport, downloadShareImage } from './export/shareImage';
 import { useGenerate } from './editor/useGenerate';
 import { invoke } from '@tauri-apps/api/core';
 
@@ -164,10 +165,12 @@ export function App() {
     return () => document.removeEventListener('keydown', onKey);
   }, [run]);
 
-  async function doExport(kind: 'json' | 'txt'): Promise<void> {
+  async function doExport(kind: 'json' | 'txt' | 'md'): Promise<void> {
     const s = useStore.getState();
     const content =
-      kind === 'json' ? buildJsonExport(s.title, s.tree) : buildTxtExport(s.title, s.tree);
+      kind === 'json' ? buildJsonExport(s.title, s.tree)
+      : kind === 'md' ? buildMdExport(s.title, s.tree)
+      : buildTxtExport(s.title, s.tree);
     const fallbackName = `${s.title || '未命名故事'}.${kind}`;
     try {
       const { save } = await import('@tauri-apps/plugin-dialog');
@@ -190,6 +193,8 @@ export function App() {
         onOpenSettings={() => setView('settings')}
         onExportJson={() => void doExport('json')}
         onExportTxt={() => void doExport('txt')}
+        onExportMd={() => void doExport('md')}
+        onExportPng={() => downloadShareImage({ title, tree })}
         onNewStory={() => newStory('未命名故事', '')}
       />
       <main className="workspace">

@@ -19,10 +19,12 @@ interface Props {
   onOpenSettings: () => void;
   onExportJson: () => void;
   onExportTxt: () => void;
+  onExportMd: () => void;
+  onExportPng: () => void;
   onNewStory: () => void;
 }
 
-export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExportTxt, onNewStory }: Props) {
+export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExportTxt, onExportMd, onExportPng, onNewStory }: Props) {
   const title = useStore((s) => s.title);
   const setTitle = useStore((s) => s.setTitle);
   const tree = useStore((s) => s.tree);
@@ -106,6 +108,24 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
             }}
           >
             <DocIcon /> {tFor(lang).exportTxt}
+          </button>
+          <button
+            className="dropdown-item"
+            onClick={() => {
+              setMenuOpen(false);
+              onExportMd();
+            }}
+          >
+            <DocIcon /> {tFor(lang).exportMd}
+          </button>
+          <button
+            className="dropdown-item"
+            onClick={() => {
+              setMenuOpen(false);
+              onExportPng();
+            }}
+          >
+            <DocIcon /> {tFor(lang).exportPng}
           </button>
           <button
             className="dropdown-item"

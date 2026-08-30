@@ -6,8 +6,15 @@
 
 ## 三行安装
 
+**普通用户（推荐）**：到 [Releases 页面](../../releases/latest) 下载
+`小梦织卷_0.1.0_x64-setup.exe`（安装版）或 `小梦织卷-0.1.0-portable.zip`（免安装便携版），
+双击即用。安装器内置 SHA256 校验值。
+
+**开发者构建**：
+
 ```powershell
-git clone <本仓库> && cd xiaomeng-zhijuan
+git clone https://github.com/PointHorse/xiaomeng-zhijuan
+cd xiaomeng-zhijuan
 npm install
 npm run tauri:build   # 产出 NSIS 安装器（src-tauri/target/release/bundle/nsis/）
 ```

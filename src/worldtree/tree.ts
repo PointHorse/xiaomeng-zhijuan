@@ -173,11 +173,26 @@ export function serialize(tree: StoryTree): string {
   return JSON.stringify(tree);
 }
 
-/** 反序列化（含最小结构校验） */
+/** 反序列化（含最小结构校验 + 原型污染防护） */
 export function deserialize(raw: string): StoryTree {
   const t = JSON.parse(raw) as StoryTree;
   if (!t || typeof t !== 'object' || !t.nodes || !t.rootId || !t.currentId) {
     throw new Error('deserialize: 结构不合法');
+  }
+  if (typeof t.nodes !== 'object' || Array.isArray(t.nodes)) {
+    throw new Error('deserialize: nodes 不合法');
+  }
+  // 原型污染防护：nodes 的键必须是自有可枚举属性，且拒绝危险键名
+  for (const key of Object.keys(t.nodes)) {
+    if (!Object.prototype.hasOwnProperty.call(t.nodes, key)) {
+      throw new Error('deserialize: nodes 含非自有属性');
+    }
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      throw new Error('deserialize: 危险节点键名');
+    }
+  }
+  if (!t.nodes[t.rootId] || !t.nodes[t.currentId]) {
+    throw new Error('deserialize: rootId/currentId 指向不存在的节点');
   }
   return t;
 }

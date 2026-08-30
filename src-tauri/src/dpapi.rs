@@ -17,7 +17,7 @@ fn wide(s: &str) -> Vec<u16> {
 /// DPAPI 加密：明文 → base64 密文
 pub fn protect(plain: &str) -> Result<String, String> {
     let bytes = plain.as_bytes();
-    let mut in_blob = CRYPT_INTEGER_BLOB {
+    let in_blob = CRYPT_INTEGER_BLOB {
         cbData: bytes.len() as u32,
         pbData: bytes.as_ptr() as *mut u8,
     };
@@ -25,7 +25,7 @@ pub fn protect(plain: &str) -> Result<String, String> {
     let desc = wide("xiaomeng-zhijuan");
     unsafe {
         CryptProtectData(
-            &mut in_blob,
+            &in_blob,
             PCWSTR(desc.as_ptr()),
             None,
             None,
@@ -50,13 +50,13 @@ pub fn reveal(blob_b64: &str) -> Result<String, String> {
     let bytes = B64
         .decode(blob_b64.as_bytes())
         .map_err(|e| format!("base64 解码失败: {e}"))?;
-    let mut in_blob = CRYPT_INTEGER_BLOB {
+    let in_blob = CRYPT_INTEGER_BLOB {
         cbData: bytes.len() as u32,
         pbData: bytes.as_ptr() as *mut u8,
     };
     let mut out_blob = CRYPT_INTEGER_BLOB::default();
     unsafe {
-        CryptUnprotectData(&mut in_blob, None, None, None, None, 0, &mut out_blob)
+        CryptUnprotectData(&in_blob, None, None, None, None, 0, &mut out_blob)
             .map_err(|e| format!("DPAPI 解密失败: {e}"))?;
     }
     let slice = unsafe {

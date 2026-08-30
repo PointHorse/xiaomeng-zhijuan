@@ -119,7 +119,7 @@ export function Logo({ scale = 1 }: { scale?: number }) {
           width: s,
           height: s,
           borderRadius: s * 0.18,
-          background: `linear-gradient(135deg, ${C.accent}, #B8552F)`,
+          background: `linear-gradient(135deg, ${C.accent}, #E85A8F)`,
           display: 'grid',
           placeItems: 'center',
         }}
@@ -129,7 +129,7 @@ export function Logo({ scale = 1 }: { scale?: number }) {
             width: s * 0.34,
             height: s * 0.34,
             borderRadius: '50%',
-            border: `${s * 0.05}px solid #FFF5F2`,
+            border: `${s * 0.05}px solid #FFF0F6`,
           }}
         />
       </div>

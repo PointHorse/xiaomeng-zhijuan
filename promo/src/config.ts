@@ -9,15 +9,15 @@ export const VIDEO = {
   height: 1080,
 } as const;
 
-/** Anthropic 式色板：米白底、赭红点缀、暖灰正文 */
+/** 粉与白色板：粉白底、玫粉点缀、暖灰正文 */
 export const C = {
-  bg: '#F7F4EE', // 米白
-  ink: '#191919', // 近黑
-  sub: '#6B675E', // 暖灰
-  accent: '#D97757', // 赭红（Anthropic 风）
-  accentSoft: '#F5E6DF',
+  bg: '#FFF5F8', // 粉白
+  ink: '#3D2B33', // 樱木深棕（粉调近黑）
+  sub: '#B08A96', // 灰粉
+  accent: '#FF7BA9', // 樱粉
+  accentSoft: '#FFE3EE',
   card: '#FFFFFF',
-  line: '#E5E0D5',
+  line: '#F9D8E4',
 };
 
 /** 每页时长（秒）→ 帧数 */

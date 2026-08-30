@@ -1,8 +1,9 @@
 /** 设置页：模型服务 / 生成参数 / 外观 / 记忆窗口 */
 import { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore';
-import { GEN_PRESETS, GEN_PRESET_LABELS, resolveTheme } from './settings';
+import { GEN_PRESETS, resolveTheme } from './settings';
 import { invoke } from '@tauri-apps/api/core';
+import { useI18n, useT } from '../i18n/useI18n';
 
 interface ProbeResult {
   ok: boolean;
@@ -39,6 +40,9 @@ export function SettingsView() {
   const settings = useStore((s) => s.settings);
   const setSettings = useStore((s) => s.setSettings);
   const setView = useStore((s) => s.setView);
+  const lang = useI18n((s) => s.lang);
+  const setLang = useI18n((s) => s.setLang);
+  const t = useT();
 
   const [probe, setProbe] = useState<ProbeResult | null>(null);
   const [probing, setProbing] = useState(false);
@@ -73,14 +77,14 @@ export function SettingsView() {
 
   return (
     <div className="settings-page">
-      <h2>设置</h2>
-      <div className="page-sub">全部数据仅保存在本机；API Key 经 Windows DPAPI 加密存储。</div>
+      <h2>{t((d) => d.settingsTitle)}</h2>
+      <div className="page-sub">{t((d) => d.settingsSub)}</div>
 
       {/* 模型服务 */}
       <section className="settings-section">
-        <h3>模型服务</h3>
+        <h3>{t((d) => d.sectionModel)}</h3>
         <div className="field-row">
-          <label>Base URL</label>
+          <label>{t((d) => d.baseUrl)}</label>
           <input
             type="text"
             value={settings.baseUrl}
@@ -89,21 +93,21 @@ export function SettingsView() {
           />
         </div>
         <div className="field-row">
-          <label>API Key</label>
+          <label>{t((d) => d.apiKey)}</label>
           <input
             type="password"
             value={settings.apiKey}
-            placeholder="本地服务可留空"
+            placeholder={t((d) => d.apiKeyPlaceholder)}
             onChange={(e) => setSettings({ apiKey: e.target.value })}
           />
         </div>
         <div className="field-row">
-          <label>模型名</label>
+          <label>{t((d) => d.model)}</label>
           <input
             type="text"
             list="model-list"
             value={settings.model}
-            placeholder="留空或填 mock 试用演示模式"
+            placeholder={t((d) => d.modelPlaceholder)}
             onChange={(e) => setSettings({ model: e.target.value })}
           />
           <datalist id="model-list">
@@ -114,20 +118,20 @@ export function SettingsView() {
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button className="pill-btn" disabled={probing} onClick={() => void runProbe()}>
-            {probing ? '测试中…' : '测试连接'}
+            {probing ? t((d) => d.testing) : t((d) => d.testConn)}
           </button>
           <button
             className="pill-btn"
             style={{ background: 'var(--text)' }}
             onClick={() => void runDetect()}
           >
-            自动探测本地服务
+            {t((d) => d.autoDetect)}
           </button>
           {probe && (
             <span style={{ fontSize: 13, color: probe.ok ? 'var(--accent)' : 'var(--sub)' }}>
               {probe.ok
-                ? `连接成功 · ${probe.latencyMs}ms · ${probe.models.length} 个模型`
-                : `失败：${probe.error ?? '未知'}`}
+                ? t((d) => d.connOk, { ms: probe.latencyMs, n: probe.models.length })
+                : t((d) => d.connFail, { e: probe.error ?? 'unknown' })}
             </span>
           )}
         </div>
@@ -138,7 +142,7 @@ export function SettingsView() {
 
       {/* 生成参数 */}
       <section className="settings-section">
-        <h3>生成参数</h3>
+        <h3>{t((d) => d.sectionGen)}</h3>
         <div className="presets">
           {(Object.keys(GEN_PRESETS) as (keyof typeof GEN_PRESETS)[]).map((k) => (
             <button
@@ -149,12 +153,12 @@ export function SettingsView() {
                 setSettings(GEN_PRESETS[k]);
               }}
             >
-              {GEN_PRESET_LABELS[k]}
+              {t((d) => d[`preset${k[0].toUpperCase()}${k.slice(1)}` as keyof typeof d])}
             </button>
           ))}
         </div>
         <div className="field-row">
-          <label>温度</label>
+          <label>{t((d) => d.temperature)}</label>
           <input
             type="number"
             min={0}
@@ -168,7 +172,7 @@ export function SettingsView() {
           />
         </div>
         <div className="field-row">
-          <label>Top P</label>
+          <label>{t((d) => d.topP)}</label>
           <input
             type="number"
             min={0}
@@ -182,7 +186,7 @@ export function SettingsView() {
           />
         </div>
         <div className="field-row">
-          <label>最大生成长度</label>
+          <label>{t((d) => d.maxTokens)}</label>
           <input
             type="number"
             min={64}
@@ -196,7 +200,7 @@ export function SettingsView() {
           />
         </div>
         <div className="field-row">
-          <label>记忆窗口（字）</label>
+          <label>{t((d) => d.contextWindow)}</label>
           <input
             type="number"
             min={1000}
@@ -208,22 +212,34 @@ export function SettingsView() {
         </div>
       </section>
 
+      {/* 语言 */}
+      <section className="settings-section">
+        <h3>{t((d) => d.sectionLang)}</h3>
+        <div className="field-row">
+          <label>{t((d) => d.language)}</label>
+          <select value={lang} onChange={(e) => setLang(e.target.value as 'zh' | 'en')}>
+            <option value="zh">{t((d) => d.langZh)}</option>
+            <option value="en">{t((d) => d.langEn)}</option>
+          </select>
+        </div>
+      </section>
+
       {/* 外观 */}
       <section className="settings-section">
-        <h3>外观</h3>
+        <h3>{t((d) => d.sectionAppearance)}</h3>
         <div className="field-row">
-          <label>主题</label>
+          <label>{t((d) => d.theme)}</label>
           <select
             value={settings.theme}
             onChange={(e) => setSettings({ theme: e.target.value as AppSettingsTheme })}
           >
-            <option value="system">跟随系统</option>
-            <option value="light">浅色</option>
-            <option value="dark">深色</option>
+            <option value="system">{t((d) => d.themeSystem)}</option>
+            <option value="light">{t((d) => d.themeLight)}</option>
+            <option value="dark">{t((d) => d.themeDark)}</option>
           </select>
         </div>
         <div className="field-row">
-          <label>字号</label>
+          <label>{t((d) => d.fontSize)}</label>
           <input
             type="number"
             min={14}
@@ -233,7 +249,7 @@ export function SettingsView() {
           />
         </div>
         <div className="field-row">
-          <label>行距</label>
+          <label>{t((d) => d.lineHeight)}</label>
           <input
             type="number"
             min={1.5}

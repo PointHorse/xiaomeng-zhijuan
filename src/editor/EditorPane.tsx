@@ -4,6 +4,7 @@ import { useStore } from '../store/useStore';
 import { timeline } from '../worldtree/tree';
 import { UndoIcon, EditIcon, CheckIcon } from '../components/Icons';
 import { useGenerate } from './useGenerate';
+import { useT } from '../i18n/useI18n';
 
 export function EditorPane() {
   const tree = useStore((s) => s.tree);
@@ -13,6 +14,7 @@ export function EditorPane() {
   const memoryTruncated = useStore((s) => s.memoryTruncated);
   const confirmEditedText = useStore((s) => s.confirmEditedText);
   const revertRed = useStore((s) => s.revertRed);
+  const t = useT();
 
   const { run, generateFromInput } = useGenerate();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -87,14 +89,14 @@ export function EditorPane() {
                   setEditing(false);
                 }}
               >
-                <CheckIcon /> 确认
+                <CheckIcon /> {t((d) => d.confirm)}
               </button>
               <button
                 onClick={() => {
                   setEditing(false);
                 }}
               >
-                取消
+                {t((d) => d.cancelAction)}
               </button>
             </div>
           </div>
@@ -112,7 +114,7 @@ export function EditorPane() {
                 revertRed();
               }}
             >
-              <UndoIcon /> 撤回
+              <UndoIcon /> {t((d) => d.undoRed)}
             </button>
             <button
               title="转为可编辑态"
@@ -121,7 +123,7 @@ export function EditorPane() {
                 setEditing(true);
               }}
             >
-              <EditIcon /> 修改
+              <EditIcon /> {t((d) => d.editRed)}
             </button>
             <button
               title="转正并继续生成"
@@ -129,7 +131,7 @@ export function EditorPane() {
                 void run();
               }}
             >
-              <CheckIcon /> 继续
+              <CheckIcon /> {t((d) => d.continueGen)}
             </button>
           </div>
         </div>
@@ -138,7 +140,7 @@ export function EditorPane() {
       {/* 错误卡片 + 重试 */}
       {!generating && gen.phase === 'error' && (
         <div className="error-card">
-          ⚠ 生成失败：{gen.errorMessage}
+          ⚠ {t((d) => d.genFailed)}：{gen.errorMessage}
           <div className="retry">
             <button
               className="pill-btn"
@@ -146,7 +148,7 @@ export function EditorPane() {
                 void run();
               }}
             >
-              重试
+              {t((d) => d.retry)}
             </button>
           </div>
         </div>
@@ -158,7 +160,7 @@ export function EditorPane() {
           <textarea
             ref={inputRef}
             className="user-input"
-            placeholder="在这里写下或粘贴故事开头… 按 Ctrl+Enter 生成续写"
+            placeholder={t((d) => d.inputPlaceholder)}
             onKeyDown={onKeyDown}
           />
           <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
@@ -172,11 +174,11 @@ export function EditorPane() {
                 }
               }}
             >
-              ✒ 写下这段并续写
+              {t((d) => d.writeAndContinue)}
             </button>
             {memoryTruncated && (
               <span style={{ fontSize: 12, color: 'var(--sub)', alignSelf: 'center' }}>
-                记忆截断：仅使用最近 {settings.contextWindow} 字作为上下文
+                {t((d) => d.memoryTruncated, { n: settings.contextWindow })}
               </span>
             )}
           </div>
@@ -186,7 +188,7 @@ export function EditorPane() {
       {/* 已完成候选数提示（转正后） */}
       {!generating && candidates.length > 0 && redNode && !editing && (
         <div style={{ marginTop: 8, fontSize: 12, color: 'var(--sub)' }}>
-          本轮共 {candidates.length} 条候选，可在右侧切换
+          {t((d) => d.candidatesInRound, { n: candidates.length })}
         </div>
       )}
     </section>

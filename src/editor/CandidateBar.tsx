@@ -2,6 +2,7 @@
 import { useStore } from '../store/useStore';
 import { RefreshIcon } from '../components/Icons';
 import { useGenerate } from './useGenerate';
+import { useT } from '../i18n/useI18n';
 
 export function CandidateBar() {
   const tree = useStore((s) => s.tree);
@@ -9,6 +10,7 @@ export function CandidateBar() {
   const gen = useStore((s) => s.gen);
   const adoptCandidate = useStore((s) => s.adoptCandidate);
   const { run } = useGenerate();
+  const t = useT();
 
   const generating = gen.phase === 'generating';
   const currentNode = tree.nodes[tree.currentId];
@@ -23,17 +25,17 @@ export function CandidateBar() {
     <aside className="candidate-pane">
       <div className="candidate-head">
         <div>
-          <h2>没有满意的？</h2>
-          <div className="sub">点击其他卡片看一看</div>
+          <h2>{t((d) => d.notSatisfied)}</h2>
+          <div className="sub">{t((d) => d.clickOtherCards)}</div>
         </div>
         <button className="pill-btn" disabled={generating} onClick={refreshBatch}>
-          <RefreshIcon /> 换一批
+          <RefreshIcon /> {t((d) => d.refreshBatch)}
         </button>
       </div>
 
       {generating && (
         <>
-          <div className="dreaming">小梦正在做梦…</div>
+          <div className="dreaming">{t((d) => d.dreamingHint)}</div>
           {gen.streamText && (
             <div className="candidate-card selected">
               <div className="cand-text">{gen.streamText.slice(-160)}</div>
@@ -61,9 +63,7 @@ export function CandidateBar() {
 
       {!generating && candidates.length === 0 && (
         <div style={{ color: 'var(--sub)', fontSize: 13, lineHeight: 1.8 }}>
-          在左侧写下故事开头并生成后，
-          <br />
-          三条候选会出现在这里。
+          {t((d) => d.emptyContent)}
         </div>
       )}
     </aside>

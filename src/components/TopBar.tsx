@@ -30,6 +30,7 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
   const settings = useStore((s) => s.settings);
   const setSettings = useStore((s) => s.setSettings);
   const genPhase = useStore((s) => s.gen.phase);
+  const lang = useI18n((s) => s.lang);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 12, y: 12 });
@@ -39,8 +40,8 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
 
   const charCount = fullTextLen(tree);
   const savedText = lastSavedAt
-    ? `最后保存于 ${formatTime(lastSavedAt)}`
-    : '尚未保存';
+    ? tFor(lang).lastSaved.replace('{t}', formatTime(lastSavedAt))
+    : tFor(lang).notSavedYet;
 
   // 点击外部关闭弹层
   useEffect(() => {
@@ -86,7 +87,7 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
               }
             }}
           >
-            <DocIcon /> 新建故事
+            <DocIcon /> {tFor(lang).newStory}
           </button>
           <button
             className="dropdown-item"
@@ -95,7 +96,7 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
               onExportJson();
             }}
           >
-            <BookIcon /> 导出 JSON
+            <BookIcon /> {tFor(lang).exportJson}
           </button>
           <button
             className="dropdown-item"
@@ -104,7 +105,7 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
               onExportTxt();
             }}
           >
-            <DocIcon /> 导出 TXT
+            <DocIcon /> {tFor(lang).exportTxt}
           </button>
           <button
             className="dropdown-item"
@@ -113,7 +114,7 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
               onOpenWorldTree();
             }}
           >
-            <TreeIcon /> 平行世界树
+            <TreeIcon /> {tFor(lang).worldTree}
           </button>
           <button
             className="dropdown-item"
@@ -122,7 +123,7 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
               onOpenSettings();
             }}
           >
-            <GearIcon /> 设置
+            <GearIcon /> {tFor(lang).settings}
           </button>
         </div>
       )}
@@ -138,12 +139,12 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
         />
         <div className="topbar-meta">
           <span>
-            <ClockIcon /> 字数统计：{charCount} 字
+            <ClockIcon /> {tFor(lang).charCount.replace('{n}', String(charCount))}
           </span>
           <span>
             <CloudIcon /> {savedText}
           </span>
-          {genPhase === 'generating' && <span style={{ color: 'var(--accent)' }}>小梦正在做梦…</span>}
+          {genPhase === 'generating' && <span style={{ color: 'var(--accent)' }}>{tFor(lang).dreaming}</span>}
         </div>
       </div>
 
@@ -222,6 +223,7 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
 }
 
 import { fullText } from '../worldtree/tree';
+import { tFor, useI18n } from '../i18n/useI18n';
 import { applyTheme, applyTypography } from '../settings/theme';
 
 function formatTime(ms: number): string {

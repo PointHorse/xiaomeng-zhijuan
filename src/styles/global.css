@@ -581,3 +581,81 @@ body {
   flex: 1;
   accent-color: var(--accent);
 }
+
+/* ---------- 风格系统 ---------- */
+.style-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13.5px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.style-chip:hover {
+  border-color: var(--accent);
+}
+.style-chip[data-active='true'] {
+  background: var(--accent-soft);
+  border: 1.5px solid var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+.style-chip-add {
+  border-style: dashed;
+  color: var(--sub);
+}
+.style-chip-add:hover {
+  color: var(--accent);
+}
+.style-chip-actions {
+  display: inline-flex;
+  color: var(--sub);
+  cursor: pointer;
+  padding: 1px;
+}
+.style-chip-actions:hover {
+  color: var(--accent);
+}
+.style-dialog-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 300;
+  display: grid;
+  place-items: center;
+}
+.style-dialog {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 22px 24px;
+  width: 560px;
+  max-width: 92vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+}
+.style-dialog-wide {
+  width: 720px;
+}
+.style-source-area {
+  flex: 1;
+  min-height: 160px;
+  resize: vertical;
+  font-size: 14px;
+  line-height: 1.7;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  outline: none;
+}
+.style-source-area:focus {
+  border-color: var(--accent);
+}

@@ -37,9 +37,15 @@ export function useGenerate() {
 
     s.beginGenerate();
     try {
+      // 风格系统：选中风格 → 其系统提示词注入请求
+      const stylePrompt = (s.settings as { styleSystemPrompt?: string }).styleSystemPrompt ?? '';
       const candidates = await generateCandidates(provider, {
         context: stitched.context,
-        instruction: INSTRUCTION,
+        instruction: stylePrompt.trim()
+          ? `${stylePrompt.trim()}
+
+${INSTRUCTION}`
+          : INSTRUCTION,
         params: {
           temperature: s.settings.temperature,
           topP: s.settings.topP,

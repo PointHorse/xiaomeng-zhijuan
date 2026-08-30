@@ -104,6 +104,21 @@ export interface Dict {
   errStream: string;
   errEmpty: string;
   errCancelled: string;
+  // 风格系统
+  styleLabel: string;
+  styleHint: string;
+  customStyleAdd: string;
+  customEditTitle: string;
+  customNewTitle: string;
+  customNameLabel: string;
+  customSourceLabel: string;
+  customSourcePlaceholder: string;
+  customAnalyzing: string;
+  customAnalyzeBtn: string;
+  customPromptLabel: string;
+  customPromptPlaceholder: string;
+  customSaveBtn: string;
+  customDeleteConfirm: string;
 }
 
 export const zh: Dict = {
@@ -198,6 +213,20 @@ export const zh: Dict = {
   errStream: '流式读取中断：{msg}',
   errEmpty: '模型未返回正文（可能已耗尽生成长度），建议在设置中调大「最大生成长度」',
   errCancelled: '已取消',
+  styleLabel: '风格',
+  styleHint: '选中风格的提示词将注入每次续写请求',
+  customStyleAdd: '自定义',
+  customEditTitle: '编辑风格',
+  customNewTitle: '新建风格',
+  customNameLabel: '风格名称',
+  customSourceLabel: '源文章',
+  customSourcePlaceholder: '粘贴一段你想模仿的文章（至少 50 字）…',
+  customAnalyzing: '分析中…',
+  customAnalyzeBtn: '分析文风并生成提示词',
+  customPromptLabel: '风格提示词（可手改）',
+  customPromptPlaceholder: '点击上方按钮自动生成，或直接手写…',
+  customSaveBtn: '保存并启用',
+  customDeleteConfirm: '确定删除该自定义风格？',
 };
 
 export const en: Dict = {
@@ -292,6 +321,20 @@ export const en: Dict = {
   errStream: 'Stream interrupted: {msg}',
   errEmpty: 'Model returned no text (length budget likely spent). Try raising "Max Tokens" in Settings',
   errCancelled: 'Cancelled',
+  styleLabel: 'Style',
+  styleHint: 'The selected style prompt is injected into every continuation request',
+  customStyleAdd: 'Custom',
+  customEditTitle: 'Edit Style',
+  customNewTitle: 'New Style',
+  customNameLabel: 'Style name',
+  customSourceLabel: 'Source article',
+  customSourcePlaceholder: 'Paste an article whose style you want to imitate (50+ chars)…',
+  customAnalyzing: 'Analyzing…',
+  customAnalyzeBtn: 'Analyze style & generate prompt',
+  customPromptLabel: 'Style prompt (editable)',
+  customPromptPlaceholder: 'Click the button above to auto-generate, or write your own…',
+  customSaveBtn: 'Save & apply',
+  customDeleteConfirm: 'Delete this custom style?',
 };
 
 export const DICTS: Record<Lang, Dict> = { zh, en };

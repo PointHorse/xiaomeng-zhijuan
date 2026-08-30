@@ -12,6 +12,9 @@ export interface AppSettings {
   maxTokens: number;
   /** 上下文窗口（字符） */
   contextWindow: number;
+  /** 风格系统：当前生效风格 */
+  activeStyleId: string;
+  styleSystemPrompt: string;
   /** 外观 */
   theme: 'light' | 'dark' | 'system';
   /** 排版 */
@@ -29,6 +32,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   topP: 0.92,
   maxTokens: 1000,
   contextWindow: 8000,
+  activeStyleId: 'style_builtin_default',
+  styleSystemPrompt: '',
   theme: 'system',
   fontSize: 18,
   lineHeight: 1.9,

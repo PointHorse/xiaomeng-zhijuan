@@ -4,6 +4,7 @@ import { useStore } from '../store/useStore';
 import { GEN_PRESETS, resolveTheme } from './settings';
 import { invoke } from '@tauri-apps/api/core';
 import { useI18n, useT } from '../i18n/useI18n';
+import { StyleSelector } from '../styles_ext/StyleSelector';
 
 interface ProbeResult {
   ok: boolean;
@@ -138,6 +139,12 @@ export function SettingsView() {
         {detectMsg && (
           <div style={{ fontSize: 13, color: 'var(--sub)', marginTop: 10 }}>{detectMsg}</div>
         )}
+      </section>
+
+      {/* 风格 */}
+      <section className="settings-section">
+        <h3>{t((d) => d.styleLabel)}</h3>
+        <StyleSelector />
       </section>
 
       {/* 生成参数 */}

@@ -1,0 +1,31 @@
+# 依赖与构建产物
+node_modules/
+dist/
+dist-portable/
+src-tauri/target/
+src-tauri/gen/
+coverage/
+
+# 打包产物（安装器与便携版）
+*.exe
+*.zip
+*.msi
+
+# 模型与数据集（绝不入库）
+*.gguf
+*.safetensors
+*.bin
+data/
+
+# 本地数据库与日志
+*.db
+*.db-journal
+*.sqlite*
+*.log
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+
+# 本地安全扫描器状态
+.mimosa/

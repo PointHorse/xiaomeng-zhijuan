@@ -1,0 +1,18 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "小梦织卷默认能力：SQL 持久化、对话框、HTTP（本地与云端模型端点）、文件导出",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "sql:default",
+    "dialog:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "http://**" },
+        { "url": "https://**" }
+      ]
+    }
+  ]
+}

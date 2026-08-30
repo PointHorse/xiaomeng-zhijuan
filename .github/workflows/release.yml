@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: 安装前端依赖
+        run: npm ci
+
+      - name: 单元测试
+        run: npm run test:cov
+
+      - name: 构建（NSIS 安装器）
+        run: npm run tauri:build
+
+      - name: 打包便携版 zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path portable/小梦织卷 | Out-Null
+          Copy-Item src-tauri/target/release/xiaomeng-zhijuan.exe portable/小梦织卷/
+          Copy-Item README-portable.txt portable/小梦织卷/
+          Compress-Archive -Path portable/小梦织卷 -DestinationPath 小梦织卷-portable.zip
+
+      - name: 计算校验值
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem src-tauri/target/release/bundle/nsis/*.exe, 小梦织卷-portable.zip
+          $lines = foreach ($f in $files) {
+            $h = (Get-FileHash $f.FullName -Algorithm SHA256).Hash
+            "$($h)  $($f.Name)"
+          }
+          $lines | Out-File SHA256SUMS.txt
+
+      - name: 发布 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            src-tauri/target/release/bundle/nsis/*.exe
+            小梦织卷-portable.zip
+            SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

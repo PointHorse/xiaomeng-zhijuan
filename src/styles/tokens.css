@@ -1,0 +1,46 @@
+/* 小梦织卷 · 设计令牌（docs/design-tokens.md 的代码化） */
+:root {
+  /* 主色：珊瑚红 */
+  --accent: #f0655a;
+  --accent-hover: #e0554a;
+  --accent-soft: #fef0ef;
+  --accent-text: #e04b40;
+
+  /* 正文与辅助 */
+  --text: #303133;
+  --sub: #909399;
+
+  /* 背景与描边 */
+  --bg: #ffffff;
+  --card: #ffffff;
+  --border: #eaeaea;
+  --menu: #9ca3af;
+
+  /* 生成游标 */
+  --cursor-line: #f0655a;
+
+  /* 骨架屏 */
+  --skeleton: #f2f3f5;
+
+  /* 排版默认 */
+  --editor-font-size: 18px;
+  --editor-line-height: 1.9;
+  --editor-font-family: 'Microsoft YaHei', 'PingFang SC', serif;
+}
+
+.dark {
+  --accent: #ff7a6e;
+  --accent-hover: #ff8d83;
+  --accent-soft: rgba(255, 122, 110, 0.12);
+  --accent-text: #ff9d94;
+
+  --text: #e6e6e6;
+  --sub: #9a9a9a;
+
+  --bg: #1e1f22;
+  --card: #2b2d31;
+  --border: #3a3d42;
+  --menu: #7a7d83;
+
+  --skeleton: #33363b;
+}

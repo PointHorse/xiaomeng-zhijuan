@@ -29,3 +29,4 @@ Thumbs.db
 
 # 本地安全扫描器状态
 .mimosa/
+out/

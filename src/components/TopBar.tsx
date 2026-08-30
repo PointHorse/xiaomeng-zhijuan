@@ -16,6 +16,7 @@ import {
 
 interface Props {
   onOpenWorldTree: () => void;
+  onOpenDashboard: () => void;
   onOpenSettings: () => void;
   onExportJson: () => void;
   onExportTxt: () => void;
@@ -24,7 +25,7 @@ interface Props {
   onNewStory: () => void;
 }
 
-export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExportTxt, onExportMd, onExportPng, onNewStory }: Props) {
+export function TopBar({ onOpenWorldTree, onOpenDashboard, onOpenSettings, onExportJson, onExportTxt, onExportMd, onExportPng, onNewStory }: Props) {
   const title = useStore((s) => s.title);
   const setTitle = useStore((s) => s.setTitle);
   const tree = useStore((s) => s.tree);
@@ -135,6 +136,15 @@ export function TopBar({ onOpenWorldTree, onOpenSettings, onExportJson, onExport
             }}
           >
             <TreeIcon /> {tFor(lang).worldTree}
+          </button>
+          <button
+            className="dropdown-item"
+            onClick={() => {
+              setMenuOpen(false);
+              onOpenDashboard();
+            }}
+          >
+            <ClockIcon /> {tFor(lang).dashTitle}
           </button>
           <button
             className="dropdown-item"

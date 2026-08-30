@@ -5,6 +5,7 @@ import { TopBar } from './components/TopBar';
 import { EditorPane } from './editor/EditorPane';
 import { CandidateBar } from './editor/CandidateBar';
 import { WorldTreeView } from './worldtree/WorldTreeView';
+import { DashboardView } from './dashboard/DashboardView';
 import { SettingsView, autoDetectLocal } from './settings/SettingsView';
 import { applyTheme, applyTypography, watchSystemTheme } from './settings/theme';
 import { initSchema, scheduleSave, loadStoryTree, listStories, writeExportFile, saveSettingsJson, loadSettingsJson } from './store/persist';
@@ -22,6 +23,7 @@ export function App() {
   const newStory = useStore((s) => s.newStory);
   const loadStory = useStore((s) => s.loadStory);
   const setView = useStore((s) => s.setView);
+  const openDashboard = () => setView('dashboard');
   const setSettings = useStore((s) => s.setSettings);
   const { run, cancel } = useGenerate();
 
@@ -190,6 +192,7 @@ export function App() {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <TopBar
         onOpenWorldTree={() => setView('worldtree')}
+        onOpenDashboard={openDashboard}
         onOpenSettings={() => setView('settings')}
         onExportJson={() => void doExport('json')}
         onExportTxt={() => void doExport('txt')}
@@ -206,6 +209,7 @@ export function App() {
           </>
         )}
         {view === 'worldtree' && <WorldTreeView />}
+        {view === 'dashboard' && <DashboardView />}
         {view === 'settings' && <SettingsView />}
       </main>
       {useStore.getState().gen.phase === 'generating' && (

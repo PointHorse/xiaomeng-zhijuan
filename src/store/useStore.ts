@@ -20,7 +20,7 @@ import {
 import type { AppSettings } from '../settings/settings';
 import { DEFAULT_SETTINGS } from '../settings/settings';
 
-export type ViewName = 'editor' | 'worldtree' | 'settings';
+export type ViewName = 'editor' | 'worldtree' | 'dashboard' | 'settings';
 export type Phase = 'idle' | 'generating' | 'error';
 
 export interface GenState {

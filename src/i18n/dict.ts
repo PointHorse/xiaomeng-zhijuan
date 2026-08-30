@@ -119,6 +119,23 @@ export interface Dict {
   customPromptPlaceholder: string;
   customSaveBtn: string;
   customDeleteConfirm: string;
+  // 仪表盘
+  dashTitle: string;
+  dashSub: string;
+  dashChars: string;
+  dashRounds: string;
+  dashTotalChars: string;
+  dashTotalRounds: string;
+  dashHistoryTitle: string;
+  dashEmpty: string;
+  dashCandidates: string;
+  dashRestore: string;
+  dashChosen: string;
+  dashDiscarded: string;
+  dashClearAll: string;
+  dashClearConfirmTitle: string;
+  dashClearConfirmBody: string;
+  dashRestored: string;
 }
 
 export const zh: Dict = {
@@ -227,6 +244,22 @@ export const zh: Dict = {
   customPromptPlaceholder: '点击上方按钮自动生成，或直接手写…',
   customSaveBtn: '保存并启用',
   customDeleteConfirm: '确定删除该自定义风格？',
+  dashTitle: '仪表盘',
+  dashSub: '数据复用平行世界树，只读展示 + 候选区回退。',
+  dashChars: '当前故事字数',
+  dashRounds: '当前故事续写次数',
+  dashTotalChars: '全部故事总字数',
+  dashTotalRounds: '全部故事续写次数',
+  dashHistoryTitle: '输出历史',
+  dashEmpty: '还没有续写记录。生成一次后，每轮的三条候选都会出现在这里。',
+  dashCandidates: '候选',
+  dashRestore: '恢复到候选区',
+  dashChosen: '已采纳',
+  dashDiscarded: '未采纳',
+  dashClearAll: '清除全部历史',
+  dashClearConfirmTitle: '清除输出历史？',
+  dashClearConfirmBody: '仅清空仪表盘展示记录，不会删除平行世界树节点，也不影响正文。此操作不可撤销。',
+  dashRestored: '已将该轮候选恢复到右侧候选区。',
 };
 
 export const en: Dict = {
@@ -335,6 +368,22 @@ export const en: Dict = {
   customPromptPlaceholder: 'Click the button above to auto-generate, or write your own…',
   customSaveBtn: 'Save & apply',
   customDeleteConfirm: 'Delete this custom style?',
+  dashTitle: 'Dashboard',
+  dashSub: 'Reuses the world tree, read-only + candidate restore.',
+  dashChars: 'Current story characters',
+  dashRounds: 'Current story generations',
+  dashTotalChars: 'Total characters (all stories)',
+  dashTotalRounds: 'Total generations (all stories)',
+  dashHistoryTitle: 'Output History',
+  dashEmpty: 'No generations yet. Every round of three candidates will appear here.',
+  dashCandidates: 'Candidates',
+  dashRestore: 'Restore to candidates panel',
+  dashChosen: 'Adopted',
+  dashDiscarded: 'Discarded',
+  dashClearAll: 'Clear all history',
+  dashClearConfirmTitle: 'Clear output history?',
+  dashClearConfirmBody: 'Only clears dashboard records. World tree nodes and story text are untouched. This cannot be undone.',
+  dashRestored: 'Candidates of this round restored to the right panel.',
 };
 
 export const DICTS: Record<Lang, Dict> = { zh, en };

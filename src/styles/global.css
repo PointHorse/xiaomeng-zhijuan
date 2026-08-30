@@ -659,3 +659,96 @@ body {
 .style-source-area:focus {
   border-color: var(--accent);
 }
+
+/* ---------- 仪表盘 ---------- */
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.dash-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.dash-num {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.dash-label {
+  font-size: 12.5px;
+  color: var(--sub);
+  margin-top: 4px;
+}
+.dash-entry {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.dash-entry-meta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 12.5px;
+  color: var(--sub);
+  margin-bottom: 10px;
+}
+.dash-restore-btn {
+  margin-left: auto;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 12.5px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.dash-restore-btn:hover {
+  background: var(--accent-soft);
+}
+.dash-entry-cands {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dash-cand {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.dash-cand.chosen {
+  border-color: var(--accent);
+}
+.dash-cand-tag {
+  font-size: 11.5px;
+  color: var(--sub);
+  margin-bottom: 4px;
+}
+.dash-cand.chosen .dash-cand-tag {
+  color: var(--accent);
+  font-weight: 600;
+}
+.dash-cand-text {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.dash-clear-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--sub);
+  font-size: 12.5px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.dash-clear-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

@@ -33,6 +33,61 @@ fn export_text_file(path: String, contents: String) -> Result<(), String> {
     std::fs::write(&path, contents).map_err(|e| e.to_string())
 }
 
+/// 导出二进制（base64 → 字节）落盘：分享长图 PNG 等用
+#[tauri::command]
+fn export_base64_file(path: String, contents_b64: String) -> Result<(), String> {
+    if path.trim().is_empty() {
+        return Err("导出路径为空".into());
+    }
+    use base64::Engine;
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(contents_b64.as_bytes())
+        .map_err(|e| format!("base64 解码失败: {e}"))?;
+    std::fs::write(&path, bytes).map_err(|e| e.to_string())
+}
+
+/// 复制 PNG 图片到系统剪贴板（Windows：PowerShell + System.Windows.Forms）
+#[tauri::command]
+fn copy_image_to_clipboard(path: String) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        let ps = format!(
+            "Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; [System.Windows.Forms.Clipboard]::SetImage([System.Drawing.Image]::FromFile('{}'));",
+            path.replace("\\", "\\\\").replace("'", "''")
+        );
+        std::process::Command::new("powershell")
+            .args(["-NoProfile", "-STA", "-Command", &ps])
+            .output()
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+    #[cfg(not(target_os = "windows"))]
+    Err("当前平台不支持图片剪贴板复制".into())
+}
+
+/// 在资源管理器中打开文件所在文件夹并选中该文件（Windows）
+#[tauri::command]
+fn open_containing_folder(path: String) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("explorer")
+            .arg(format!("/select,{}", path))
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        if let Some(parent) = std::path::Path::new(&path).parent() {
+            std::process::Command::new("xdg-open")
+                .arg(parent)
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let migrations = vec![Migration {
@@ -58,7 +113,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             dpapi_protect,
             dpapi_reveal,
-            export_text_file
+            export_text_file,
+            export_base64_file,
+            open_containing_folder,
+            copy_image_to_clipboard
         ])
         .setup(|app| {
             // Win11 Mica 质感；失败优雅降级为纯色（不影响功能）

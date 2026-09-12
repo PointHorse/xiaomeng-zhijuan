@@ -1,5 +1,5 @@
 /** 应用根组件：视图路由 + 主题/排版/自动保存/快捷键/首启探测 */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore } from './store/useStore';
 import { TopBar } from './components/TopBar';
 import { EditorPane } from './editor/EditorPane';
@@ -10,7 +10,7 @@ import { SettingsView, autoDetectLocal } from './settings/SettingsView';
 import { applyTheme, applyTypography, watchSystemTheme } from './settings/theme';
 import { initSchema, scheduleSave, loadStoryTree, listStories, writeExportFile, saveSettingsJson, loadSettingsJson } from './store/persist';
 import { buildJsonExport, buildTxtExport } from './export/exporters';
-import { buildMdExport, downloadShareImage } from './export/shareImage';
+import { buildMdExport, renderAndSaveShareImage } from './export/shareImage';
 import { useGenerate } from './editor/useGenerate';
 import { invoke } from '@tauri-apps/api/core';
 
@@ -188,6 +188,18 @@ export function App() {
     showToast(`已导出 .${kind}`);
   }
 
+  const [pngPreview, setPngPreview] = useState<{ path: string; dataUrl: string } | null>(null);
+
+  async function doExportPng(): Promise<void> {
+    try {
+      const r = await renderAndSaveShareImage({ title, tree });
+      if (r.path) setPngPreview({ path: r.path, dataUrl: r.dataUrl });
+      else showToast('已取消保存');
+    } catch (e) {
+      showToast(`长图保存失败：${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <TopBar
@@ -197,7 +209,7 @@ export function App() {
         onExportJson={() => void doExport('json')}
         onExportTxt={() => void doExport('txt')}
         onExportMd={() => void doExport('md')}
-        onExportPng={() => downloadShareImage({ title, tree })}
+        onExportPng={() => void doExportPng()}
         onNewStory={() => newStory('未命名故事', '')}
       />
       <main className="workspace">
@@ -212,6 +224,35 @@ export function App() {
         {view === 'dashboard' && <DashboardView />}
         {view === 'settings' && <SettingsView />}
       </main>
+      {pngPreview && (
+        <div className="style-dialog-mask" onClick={() => setPngPreview(null)}>
+          <div className="style-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 12px', fontSize: 16 }}>分享长图已生成</h3>
+            <img src={pngPreview.dataUrl} alt="分享长图预览" style={{ width: '100%', borderRadius: 8, border: '1px solid var(--border)' }} />
+            <div style={{ fontSize: 12, color: 'var(--sub)', margin: '12px 0', wordBreak: 'break-all' }}>
+              保存路径：{pngPreview.path}
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button className="pill-btn" onClick={() => { void navigator.clipboard.writeText(pngPreview.path); showToast('路径已复制'); }}>
+                复制路径
+              </button>
+              <button className="pill-btn" style={{ background: 'var(--text)' }} onClick={async () => {
+                try {
+                  await invoke('copy_image_to_clipboard', { path: pngPreview.path });
+                  showToast('图片已复制到剪贴板');
+                } catch { showToast('复制失败（可用「打开所在文件夹」后手动复制）'); }
+              }}>
+                复制图片
+              </button>
+              <button className="pill-btn" style={{ background: 'var(--text)' }} onClick={async () => {
+                try { await invoke('open_containing_folder', { path: pngPreview.path }); } catch { showToast('打开文件夹失败'); }
+              }}>
+                打开所在文件夹
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {useStore.getState().gen.phase === 'generating' && (
         <button
           className="hint-toast"

@@ -115,11 +115,37 @@ export function renderShareImage(opts: ShareImageOptions): HTMLCanvasElement {
   return canvas;
 }
 
-/** 渲染并触发 PNG 下载 */
-export function downloadShareImage(opts: ShareImageOptions): void {
+const IS_TAURI = typeof globalThis !== 'undefined' && '__TAURI_INTERNALS__' in globalThis;
+
+export interface ShareSaveResult {
+  /** 保存到的完整路径；用户取消时为 null */
+  path: string | null;
+  /** PNG 的 dataURL（预览用） */
+  dataUrl: string;
+}
+
+/** DCR③ 渲染并保存长图：Tauri 系统对话框 + Rust 落盘；浏览器降级为下载 */
+export async function renderAndSaveShareImage(opts: ShareImageOptions): Promise<ShareSaveResult> {
   const canvas = renderShareImage(opts);
+  const dataUrl = canvas.toDataURL('image/png');
+  const fallbackName = `${opts.title || 'DreamCore'}-分享.png`;
+
+  if (IS_TAURI) {
+    const { save } = await import('@tauri-apps/plugin-dialog');
+    const path = await save({
+      defaultPath: fallbackName,
+      filters: [{ name: 'PNG 图片', extensions: ['png'] }],
+    });
+    if (!path) return { path: null, dataUrl };
+    const b64 = dataUrl.split(',')[1];
+    const { invoke } = await import('@tauri-apps/api/core');
+    await invoke('export_base64_file', { path, contentsB64: b64 });
+    return { path, dataUrl };
+  }
+
   const link = document.createElement('a');
-  link.download = `${opts.title || 'DreamCore'}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.download = fallbackName;
+  link.href = dataUrl;
   link.click();
+  return { path: fallbackName, dataUrl };
 }

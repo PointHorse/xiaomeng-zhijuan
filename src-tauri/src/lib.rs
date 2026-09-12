@@ -119,10 +119,12 @@ pub fn run() {
             copy_image_to_clipboard
         ])
         .setup(|app| {
-            // Win11 Mica 质感；失败优雅降级为纯色（不影响功能）
+            // Win11 Mica 质感；非桌面平台或不支持时优雅降级为纯色
+            #[cfg(all(windows, not(mobile)))]
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window_vibrancy::apply_mica(&window, None);
             }
+            let _ = app; // 移动平台占位
             Ok(())
         })
         .run(tauri::generate_context!())

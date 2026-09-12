@@ -2,10 +2,15 @@
 //! 密文绑定当前 Windows 用户账户，换机器/换用户无法解密。
 //! 本模块只提供纯函数；Tauri 命令包装见 lib.rs（规避跨模块命令宏可见性问题）。
 
+#[cfg(windows)]
 use base64::engine::general_purpose::STANDARD as B64;
+#[cfg(windows)]
 use base64::Engine;
+#[cfg(windows)]
 use windows::core::PCWSTR;
+#[cfg(windows)]
 use windows::Win32::Foundation::{LocalFree, HLOCAL};
+#[cfg(windows)]
 use windows::Win32::Security::Cryptography::{
     CryptProtectData, CryptUnprotectData, CRYPT_INTEGER_BLOB,
 };
@@ -14,7 +19,19 @@ fn wide(s: &str) -> Vec<u16> {
     s.encode_utf16().chain(std::iter::once(0)).collect()
 }
 
+/// 非 Windows 回退：返回错误提示（Android 侧用 KeyStore/stronghold 方案替代）
+#[cfg(not(windows))]
+pub fn protect(_plain: &str) -> Result<String, String> {
+    Err("DPAPI 仅 Windows 可用；Android 侧请接入 Keystore 方案".into())
+}
+
+#[cfg(not(windows))]
+pub fn reveal(_blob_b64: &str) -> Result<String, String> {
+    Err("DPAPI 仅 Windows 可用；Android 侧请接入 Keystore 方案".into())
+}
+
 /// DPAPI 加密：明文 → base64 密文
+#[cfg(windows)]
 pub fn protect(plain: &str) -> Result<String, String> {
     let bytes = plain.as_bytes();
     let in_blob = CRYPT_INTEGER_BLOB {
@@ -46,6 +63,7 @@ pub fn protect(plain: &str) -> Result<String, String> {
 }
 
 /// DPAPI 解密：base64 密文 → 明文
+#[cfg(windows)]
 pub fn reveal(blob_b64: &str) -> Result<String, String> {
     let bytes = B64
         .decode(blob_b64.as_bytes())

@@ -13,6 +13,7 @@ import {
   GearIcon,
   DocIcon,
 } from './Icons';
+import { StyleDropdown } from '../styles_ext/StyleDropdown';
 
 interface Props {
   onOpenWorldTree: () => void;
@@ -180,6 +181,7 @@ export function TopBar({ onOpenWorldTree, onOpenDashboard, onOpenSettings, onExp
 
       {/* 右侧 */}
       <div className="topbar-right">
+        <StyleDropdown />
         <button
           className="icon-btn"
           title="字号与排版"

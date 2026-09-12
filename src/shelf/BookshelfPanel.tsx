@@ -102,12 +102,6 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
   async function exportFolderZip(folderId: string, folderName: string): Promise<void> {
     const formats = [...zipFormats];
     if (formats.length === 0) return;
-    const { default: sql } = await import('@tauri-apps/plugin-sql');
-    const rows = await sql.execute(
-      'UPDATE stories SET folder_id = folder_id WHERE folder_id = $1',
-      [folderId],
-    );
-    void rows;
     const all = await listShelfStories();
     const inFolder = all.filter((s) => s.folderId === folderId);
     if (inFolder.length === 0) {
@@ -388,10 +382,6 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
       </div>
     );
   }
-}
-
-function IS_TAURI(): boolean {
-  return typeof globalThis !== 'undefined' && '__TAURI_INTERNALS__' in globalThis;
 }
 
 function fullTextOf(tree: ReturnType<typeof deserialize>): string {

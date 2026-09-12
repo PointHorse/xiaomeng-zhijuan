@@ -4,7 +4,6 @@
  * 兼容旧库：启动时 PRAGMA 检测并 ALTER。
  * 安全：全部查询使用 $N 参数绑定；本模块无任何命令执行。
  */
-import type { StoryTree } from '../worldtree/tree';
 
 const IS_TAURI = typeof globalThis !== 'undefined' && '__TAURI_INTERNALS__' in globalThis;
 
@@ -48,7 +47,7 @@ export async function initShelfSchema(): Promise<void> {
      )`,
   );
   // 兼容旧库：检测 folder_id 列是否存在
-  const cols = await db.select<{ name: string }[]>('PRAGMA table_info(stories)');
+  const cols = await db.select<{ name: string }>('PRAGMA table_info(stories)');
   const hasFolder = Array.isArray(cols) && cols.some((c) => c.name === 'folder_id');
   if (!hasFolder) {
     await db.execute('ALTER TABLE stories ADD COLUMN folder_id TEXT');

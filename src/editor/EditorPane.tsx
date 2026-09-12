@@ -15,6 +15,8 @@ export function EditorPane() {
   const editAdoptedText = useStore((s) => s.editAdoptedText);
   const confirmEditedText = useStore((s) => s.confirmEditedText);
   const revertRed = useStore((s) => s.revertRed);
+  const redConfirmed = useStore((s) => s.redConfirmed);
+  const keepRed = useStore((s) => s.keepRed);
   const t = useT();
 
   const { run, generateFromInput } = useGenerate();
@@ -74,8 +76,8 @@ export function EditorPane() {
       )}
       {!generating && redNode && !editing && (
         <article className="story-text">
-          <span className="red">{redNode.text}</span>
-          <span className="red-line" />
+          <span className={redConfirmed ? '' : 'red'}>{redNode.text}</span>
+          {!redConfirmed && <span className="red-line" />}
         </article>
       )}
 

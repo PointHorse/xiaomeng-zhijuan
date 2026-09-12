@@ -178,22 +178,32 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
               </button>
             </>
           ) : (
-            <button
-              className="shelf-mini-btn"
-              onContextMenu={(e) => {
-                e.preventDefault();
-                // 长按右键 ≥600ms 进入多选
-                pressTimer.current = setTimeout(() => {
-                  setMulti(true);
-                }, 600);
-              }}
-              onContextMenuCapture={() => undefined}
-              onMouseDown={() => undefined}
-              onClick={() => setMulti(true)}
-              title="多选（或长按右键）"
-            >
-              多选
-            </button>
+            <>
+              <button
+                className="shelf-mini-btn"
+                onClick={() => {
+                  const id = `story_${Date.now().toString(36)}`;
+                  onOpen(id, '未命名故事', JSON.stringify({
+                    nodes: { [id]: { id, parentId: null, text: '', candidates: [], chosenCandidateId: null, source: 'user', createdAt: Date.now() } },
+                    rootId: id, currentId: id, history: [id], historyIndex: 0,
+                  }));
+                }}
+                title="新建一本故事"
+              >
+                ＋ 新建
+              </button>
+              <button
+                className="shelf-mini-btn"
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  pressTimer.current = setTimeout(() => setMulti(true), 600);
+                }}
+                onClick={() => setMulti(true)}
+                title="多选（或长按右键）"
+              >
+                多选
+              </button>
+            </>
           )}
           <button className="shelf-mini-btn" onClick={onToggle} title="折叠">
             ◀

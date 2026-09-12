@@ -40,6 +40,8 @@ export interface AppState {
   view: ViewName;
   /** 生成状态 */
   gen: GenState;
+  /** DCR：保留按钮——确认当前红色文本但不再续写 */
+  redConfirmed: boolean;
   /** 全部候选（生成完成后填充） */
   candidates: Candidate[];
   /** 自动保存时间戳（ms），0 表示未保存过 */
@@ -74,6 +76,8 @@ export interface AppState {
   adoptCandidate: (candidateId: string) => void;
   /** 撤回：指针回退到生成前节点 */
   revertRed: () => void;
+  /** DCR：保留当前红色文本（不续写） */
+  keepRed: () => void;
   travelTo: (nodeId: string) => void;
   undo: () => void;
   redo: () => void;
@@ -93,6 +97,7 @@ export const useStore = create<AppState>((set, get) => ({
   candidates: [],
   lastSavedAt: 0,
   memoryTruncated: false,
+  redConfirmed: false,
   storyOverride: null,
   editUndoStack: [],
 
@@ -138,7 +143,8 @@ export const useStore = create<AppState>((set, get) => ({
   setView: (view) => set({ view }),
   markSaved: () => set({ lastSavedAt: Date.now() }),
 
-  beginGenerate: () => set({ gen: { phase: 'generating', streamText: '', errorMessage: '' }, candidates: [] }),
+  beginGenerate: () => set({ gen: { phase: 'generating', streamText: '', errorMessage: '' }, candidates: [], redConfirmed: false }),
+  keepRed: () => set({ redConfirmed: true }),
   appendStream: (delta) => set({ gen: { ...get().gen, streamText: get().gen.streamText + delta } }),
   finishGenerate: (candidates) => {
     const t = get().tree;

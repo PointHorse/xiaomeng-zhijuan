@@ -153,10 +153,15 @@ export function SettingsView() {
           <input
             type="text"
             value={settings.baseUrl}
-            placeholder="http://127.0.0.1:8080/v1"
+            placeholder="仅支持 OpenAI 兼容格式，如 http://localhost:11434/v1"
             onChange={(e) => setSettings({ baseUrl: e.target.value })}
           />
         </div>
+        {/\/anthropic|\/messages|\/v1\/complete/i.test(settings.baseUrl) && (
+          <div style={{ fontSize: 12.5, color: 'var(--accent)', margin: '-8px 0 14px 122px' }}>
+            ⚠ 检测到非 OpenAI 兼容路径（/anthropic、/messages 等）。本应用仅支持 OpenAI 格式——DeepSeek 请填 https://api.deepseek.com（不带 /anthropic）
+          </div>
+        )}
         <div className="field-row">
           <label>{t((d) => d.apiKey)}</label>
           <input

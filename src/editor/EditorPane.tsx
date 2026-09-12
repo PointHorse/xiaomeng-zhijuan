@@ -135,7 +135,15 @@ export function EditorPane() {
               <EditIcon /> {t((d) => d.editRed)}
             </button>
             <button
-              title="转正并继续生成"
+              title="确认当前内容，不再续写"
+              onClick={() => {
+                keepRed();
+              }}
+            >
+              ✓ {t((d) => d.continueGen) ? '保留' : '保留'}
+            </button>
+            <button
+              title="确认当前内容并继续生成"
               onClick={() => {
                 void run();
               }}

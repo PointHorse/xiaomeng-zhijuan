@@ -23,19 +23,19 @@ export function EditorPane() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // 编辑态（修改红色文本）
   const [editing, setEditing] = useState(false);
-  const [liveCount, setCharCount] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
+  /** DCR fix：撤回/保留后隐藏工具条，新一轮生成时重置 */
+  const [toolbarDismissed, setToolbarDismissed] = useState(false);
 
   const nodes = timeline(tree);
   const lastNode = nodes[nodes.length - 1];
-  // 红色未确认段 = 时间线最后一个 AI 节点
   const redNode = lastNode && lastNode.source === 'ai' ? lastNode : null;
   const adoptedNodes = redNode ? nodes.slice(0, -1) : nodes;
 
   const generating = gen.phase === 'generating';
-  const showRed = (redNode && !generating) || (generating && gen.streamText);
+  const showRed = (redNode && !generating && !redConfirmed && !toolbarDismissed) || (generating && gen.streamText);
+  const showToolbar = !generating && redNode && !editing && !redConfirmed && !toolbarDismissed;
   const showInput = !generating && !showRed;
 
   // 自动滚动到底部
@@ -43,6 +43,11 @@ export function EditorPane() {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [gen.streamText, tree.currentId, lastNode?.text]);
+
+  // 新一轮生成开始时重置 toolbarDismissed
+  useEffect(() => {
+    if (generating) setToolbarDismissed(false);
+  }, [generating]);
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>): void {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
@@ -55,14 +60,11 @@ export function EditorPane() {
 
   return (
     <section className="editor-pane" ref={scrollRef}>
-      {/* 已采纳正文（深灰，DCR② 全程可自由编辑） */}
+      {/* 已采纳正文（深灰，全程可自由编辑） */}
       <textarea
         className="adopted-edit"
         value={adoptedNodes.map((n) => n.text).join('')}
-        onChange={(e) => {
-          editAdoptedText(e.target.value);
-          setCharCount(e.target.value.length);
-        }}
+        onChange={(e) => editAdoptedText(e.target.value)}
         spellCheck={false}
         placeholder="写下故事开头…"
       />
@@ -74,7 +76,7 @@ export function EditorPane() {
           <span className="stream-caret" />
         </article>
       )}
-      {!generating && redNode && !editing && (
+      {!generating && redNode && !editing && !toolbarDismissed && (
         <article className="story-text">
           <span className={redConfirmed ? '' : 'red'}>{redNode.text}</span>
           {!redConfirmed && <span className="red-line" />}
@@ -96,6 +98,7 @@ export function EditorPane() {
                 onClick={() => {
                   confirmEditedText(editValue);
                   setEditing(false);
+                  setToolbarDismissed(true);
                 }}
               >
                 <CheckIcon /> {t((d) => d.confirm)}
@@ -112,14 +115,15 @@ export function EditorPane() {
         </>
       )}
 
-      {/* 红色游标工具条（撤回 / 修改 / 继续） */}
-      {!generating && redNode && !editing && (
+      {/* 工具条：撤回 / 修改 / 保留 / 继续 */}
+      {showToolbar && (
         <div className="cursor-toolbar">
           <div className="inner">
             <button
               title="删除本次红色续写，回到生成前"
               onClick={() => {
                 setEditing(false);
+                setToolbarDismissed(true);
                 revertRed();
               }}
             >
@@ -138,9 +142,10 @@ export function EditorPane() {
               title="确认当前内容，不再续写"
               onClick={() => {
                 keepRed();
+                setToolbarDismissed(true);
               }}
             >
-              ✓ {t((d) => d.continueGen) ? '保留' : '保留'}
+              ✓ 保留
             </button>
             <button
               title="确认当前内容并继续生成"
@@ -171,7 +176,7 @@ export function EditorPane() {
         </div>
       )}
 
-      {/* 用户输入区（空闲时） */}
+      {/* 用户输入区 */}
       {showInput && (
         <>
           <textarea
@@ -202,11 +207,10 @@ export function EditorPane() {
         </>
       )}
 
-      {/* 已完成候选数提示（转正后） */}
-      {!generating && candidates.length > 0 && redNode && !editing && (
+      {/* 候选数提示 */}
+      {!generating && candidates.length > 0 && redNode && !editing && !toolbarDismissed && (
         <div style={{ marginTop: 8, fontSize: 12, color: 'var(--sub)' }}>
           {t((d) => d.candidatesInRound, { n: candidates.length })}
-          {liveCount !== null && <span style={{ marginLeft: 10 }}>字数：{liveCount}</span>}
         </div>
       )}
     </section>

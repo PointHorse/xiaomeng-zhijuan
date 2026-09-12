@@ -124,6 +124,18 @@ export function App() {
       }
       // DCR⑦：水合完成后才允许设置持久化（防止挂载时默认值覆盖存储）
       hydratedRef.current = true;
+      // 确保始终有 storyId（否则自动保存/书架全部失效）
+      if (!useStore.getState().storyId) {
+        const genId = `story_${Date.now().toString(36)}`;
+        useStore.setState({
+          storyId: genId,
+          title: `未命名故事`,
+          tree: {
+            nodes: { [genId]: { id: genId, parentId: null, text: '', candidates: [], chosenCandidateId: null, source: 'user', createdAt: Date.now() } },
+            rootId: genId, currentId: genId, history: [genId], historyIndex: 0,
+          },
+        });
+      }
     })();
     return watchSystemTheme(() => applyTheme(useStore.getState().settings.theme));
   }, []);

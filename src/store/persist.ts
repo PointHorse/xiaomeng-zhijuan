@@ -98,7 +98,7 @@ export function scheduleSave(payload: PersistPayload, onSaved: () => void): void
       // 检测 folder_id 列是否存在（旧库兼容）
       let hasFolderCol = false;
       try {
-        const cols = await db.select<{ name: string }[]>('PRAGMA table_info(stories)');
+        const cols = await db.select<{ name: string }>('PRAGMA table_info(stories)');
         hasFolderCol = Array.isArray(cols) && cols.some((c) => c.name === 'folder_id');
       } catch {}
       if (hasFolderCol) {

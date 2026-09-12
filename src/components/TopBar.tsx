@@ -193,6 +193,9 @@ export function TopBar({ onOpenWorldTree, onOpenDashboard, onOpenSettings, onExp
       {/* 右侧 */}
       <div className="topbar-right">
         <StyleDropdown />
+        <span className="topbar-model" title="当前生效模型">
+          ⚡ {settings.model || 'mock'}
+        </span>
         <button
           className="icon-btn"
           title="字号与排版"

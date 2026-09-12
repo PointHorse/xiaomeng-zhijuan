@@ -1,5 +1,5 @@
 /** 应用根组件：视图路由 + 主题/排版/自动保存/快捷键/首启探测 */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from './store/useStore';
 import { TopBar } from './components/TopBar';
 import { EditorPane } from './editor/EditorPane';
@@ -17,6 +17,7 @@ import { useGenerate } from './editor/useGenerate';
 import { invoke } from '@tauri-apps/api/core';
 
 export function App() {
+  const hydratedRef = useRef(false);
   const view = useStore((s) => s.view);
   const title = useStore((s) => s.title);
   const tree = useStore((s) => s.tree);
@@ -64,6 +65,8 @@ export function App() {
             fontSize?: number;
             lineHeight?: number;
             fontFamily?: string;
+            activeStyleId?: string;
+            styleSystemPrompt?: string;
           };
           let apiKey = parsed.apiKey ?? '';
           if (apiKey.startsWith('enc:v1:')) {
@@ -81,6 +84,8 @@ export function App() {
             fontSize: parsed.fontSize ?? 18,
             lineHeight: parsed.lineHeight ?? 1.9,
             fontFamily: parsed.fontFamily ?? '"Microsoft YaHei", "PingFang SC", serif',
+            activeStyleId: parsed.activeStyleId ?? 'style_builtin_default',
+            styleSystemPrompt: parsed.styleSystemPrompt ?? '',
           });
           useStore.setState({ settings: { ...useStore.getState().settings, apiKey } });
         } catch {
@@ -111,12 +116,15 @@ export function App() {
           showToast(`检测到本地模型服务：${found.url}（模型：${found.model}）`);
         }
       }
+      // DCR⑦：水合完成后才允许设置持久化（防止挂载时默认值覆盖存储）
+      hydratedRef.current = true;
     })();
     return watchSystemTheme(() => applyTheme(useStore.getState().settings.theme));
   }, []);
 
-  // 设置变化：API Key 经 DPAPI 加密后持久化
+  // 设置变化：水合完成后才持久化；API Key 经 DPAPI 加密
   useEffect(() => {
+    if (!hydratedRef.current) return;
     void (async () => {
       let storedKey = settings.apiKey;
       if (storedKey && !storedKey.startsWith('enc:v1:')) {
@@ -231,10 +239,13 @@ export function App() {
       <BookshelfPanel
         collapsed={shelfCollapsed}
         onToggle={() => setShelfCollapsed((v) => !v)}
-        onOpen={(id, t, treeJson) => {
+        onOpen={async (id, t, treeJson) => {
           try {
             const parsed = JSON.parse(treeJson) as never;
             loadStory(id, t, parsed);
+            const { loadOverride } = await import('./shelf/storyOverride');
+            const ov = await loadOverride(id);
+            useStore.getState().setStoryOverride(ov);
             setView('editor');
           } catch { showToast('故事数据损坏'); }
         }}

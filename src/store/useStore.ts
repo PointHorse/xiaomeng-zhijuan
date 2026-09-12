@@ -51,6 +51,9 @@ export interface AppState {
   undoEdit: () => void;
   /** 记忆截断提示 */
   memoryTruncated: boolean;
+  /** DCR⑦ 当前故事的模型覆盖（loadStory 时由 App 层填充） */
+  storyOverride: { baseUrl?: string; model?: string; apiKey?: string; temperature?: number } | null;
+  setStoryOverride: (ov: { baseUrl?: string; model?: string; apiKey?: string; temperature?: number } | null) => void;
 
   newStory: (title: string, rootText: string) => void;
   loadStory: (storyId: string, title: string, tree: StoryTree) => void;
@@ -90,6 +93,7 @@ export const useStore = create<AppState>((set, get) => ({
   candidates: [],
   lastSavedAt: 0,
   memoryTruncated: false,
+  storyOverride: null,
   editUndoStack: [],
 
   editAdoptedText: (newFull) => {
@@ -125,8 +129,9 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   loadStory: (storyId, title, tree) => {
-    set({ storyId, title, tree, view: 'editor', gen: freshGen(), candidates: [] });
+    set({ storyId, title, tree, view: 'editor', gen: freshGen(), candidates: [], storyOverride: null });
   },
+  setStoryOverride: (ov) => set({ storyOverride: ov }),
 
   setTitle: (title) => set({ title }),
   setSettings: (patch) => set({ settings: { ...get().settings, ...patch } }),

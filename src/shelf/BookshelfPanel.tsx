@@ -44,6 +44,7 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [renaming, setRenaming] = useState<{ id: string; kind: 'story' | 'folder'; value: string } | null>(null);
   const [zipDialog, setZipDialog] = useState<{ folderId: string; name: string } | null>(null);
+  const [modelDialog, setModelDialog] = useState<{ storyId: string; title: string; baseUrl: string; model: string; temperature: string } | null>(null);
   const [zipFormats, setZipFormats] = useState<Set<'txt' | 'html' | 'json'>>(new Set(['txt']));
   const [message, setMessage] = useState('');
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -231,6 +232,20 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
           <button className="dropdown-item" onClick={() => { setRenaming({ id: menu.id, kind: 'story', value: stories.find((s) => s.id === menu.id)?.title ?? '' }); setMenu({ kind: 'none' }); }}>
             重命名
           </button>
+          <button className="dropdown-item" onClick={async () => {
+            const { loadOverride } = await import('./storyOverride');
+            const ov = await loadOverride(menu.id);
+            setModelDialog({
+              storyId: menu.id,
+              title: stories.find((s) => s.id === menu.id)?.title ?? '',
+              baseUrl: ov?.baseUrl ?? '',
+              model: ov?.model ?? '',
+              temperature: ov?.temperature !== undefined ? String(ov.temperature) : '',
+            });
+            setMenu({ kind: 'none' });
+          }}>
+            模型设置
+          </button>
           <button
             className="dropdown-item"
             onClick={async () => {
@@ -278,6 +293,48 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
             <div style={{ textAlign: 'right' }}>
               <button className="pill-btn" onClick={() => void doRename()}>
                 确认
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 每本书模型设置 */}
+      {modelDialog && (
+        <div className="style-dialog-mask" onClick={() => setModelDialog(null)}>
+          <div className="style-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 6px', fontSize: 15 }}>模型设置 · {modelDialog.title}</h3>
+            <div style={{ fontSize: 12, color: 'var(--sub)', marginBottom: 14 }}>留空的项沿用全局设置。</div>
+            <div className="field-row">
+              <label>Base URL</label>
+              <input type="text" value={modelDialog.baseUrl} placeholder="http://localhost:11434/v1"
+                onChange={(e) => setModelDialog({ ...modelDialog, baseUrl: e.target.value })} />
+            </div>
+            <div className="field-row">
+              <label>模型名</label>
+              <input type="text" value={modelDialog.model} placeholder="留空 = 全局"
+                onChange={(e) => setModelDialog({ ...modelDialog, model: e.target.value })} />
+            </div>
+            <div className="field-row">
+              <label>温度</label>
+              <input type="number" min={0} max={2} step={0.05} value={modelDialog.temperature}
+                onChange={(e) => setModelDialog({ ...modelDialog, temperature: e.target.value })} />
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button className="pill-btn" style={{ background: 'var(--text)' }} onClick={() => setModelDialog(null)}>
+                取消
+              </button>
+              <button className="pill-btn" onClick={async () => {
+                const { saveOverride } = await import('./storyOverride');
+                const ov: Record<string, string | number> = {};
+                if (modelDialog.baseUrl.trim()) ov.baseUrl = modelDialog.baseUrl.trim();
+                if (modelDialog.model.trim()) ov.model = modelDialog.model.trim();
+                if (modelDialog.temperature.trim()) ov.temperature = Number(modelDialog.temperature);
+                await saveOverride(modelDialog.storyId, ov);
+                setModelDialog(null);
+                setMessage('模型设置已保存（该书续写即生效）');
+              }}>
+                保存
               </button>
             </div>
           </div>

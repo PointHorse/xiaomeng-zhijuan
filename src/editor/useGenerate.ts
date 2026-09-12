@@ -17,8 +17,12 @@ export function useGenerate() {
   const abortRef = useRef<AbortController | null>(null);
 
   function buildProvider(): Provider {
-    const { baseUrl, apiKey, model } = useStore.getState().settings;
-    // 未配置模型或显式填 mock 时使用演示服务
+    const s = useStore.getState();
+    // DCR⑦：书覆盖 > 全局
+    const ov = s.storyOverride;
+    const baseUrl = ov?.baseUrl || s.settings.baseUrl;
+    const model = ov?.model || s.settings.model;
+    const apiKey = ov?.apiKey || s.settings.apiKey;
     if (!model || model === 'mock') return createMockProvider();
     return createProvider({ baseUrl, apiKey, model });
   }

@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { GEN_PRESETS, resolveTheme } from './settings';
-import { invoke } from '@tauri-apps/api/core';
 import { useI18n, useT } from '../i18n/useI18n';
 import { StyleSelector } from '../styles_ext/StyleSelector';
 

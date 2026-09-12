@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { timeline } from '../worldtree/tree';
-import { UndoIcon, EditIcon, CheckIcon, RefreshIcon } from '../components/Icons';
+import { UndoIcon, EditIcon, CheckIcon } from '../components/Icons';
 import { useGenerate } from './useGenerate';
 import { useT } from '../i18n/useI18n';
 

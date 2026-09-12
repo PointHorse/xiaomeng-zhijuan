@@ -6,6 +6,8 @@ import { EditorPane } from './editor/EditorPane';
 import { CandidateBar } from './editor/CandidateBar';
 import { WorldTreeView } from './worldtree/WorldTreeView';
 import { DashboardView } from './dashboard/DashboardView';
+import { BookshelfPanel } from './shelf/BookshelfPanel';
+import { initShelfSchema, saveToShelf, listShelfStories, nextUntitledNumber } from './shelf/shelf';
 import { SettingsView, autoDetectLocal } from './settings/SettingsView';
 import { applyTheme, applyTypography, watchSystemTheme } from './settings/theme';
 import { initSchema, scheduleSave, loadStoryTree, listStories, writeExportFile, saveSettingsJson, loadSettingsJson } from './store/persist';
@@ -26,11 +28,27 @@ export function App() {
   const openDashboard = () => setView('dashboard');
   const setSettings = useStore((s) => s.setSettings);
   const { run, cancel } = useGenerate();
+  const [shelfCollapsed, setShelfCollapsed] = useState(false);
+
+  async function saveNow(): Promise<void> {
+    const s = useStore.getState();
+    if (!s.storyId) return;
+    const existing = await listShelfStories().catch(() => []);
+    let finalTitle = s.title.trim();
+    if (!finalTitle || finalTitle === '未命名故事') {
+      finalTitle = `未命名${nextUntitledNumber(existing.map((x) => x.title))}`;
+    }
+    await saveToShelf(s.storyId, finalTitle, JSON.stringify(s.tree), existing.find((x) => x.id === s.storyId)?.folderId ?? null);
+    s.setTitle(finalTitle);
+    s.markSaved();
+    showToast(`已保存「${finalTitle}」`);
+  }
 
   // 初始化：建库、恢复设置（Key 为 DPAPI 密文则解密）与最近故事、首启探测
   useEffect(() => {
     void (async () => {
       await initSchema();
+      await initShelfSchema();
       const rawSettings = await loadSettingsJson();
       if (rawSettings) {
         try {
@@ -156,11 +174,7 @@ export function App() {
         s.redo();
       } else if (e.key.toLowerCase() === 's') {
         e.preventDefault();
-        scheduleSave(
-          { id: s.storyId, title: s.title, treeJson: JSON.stringify(s.tree) },
-          () => useStore.getState().markSaved(),
-        );
-        showToast('已保存');
+        void saveNow();
       }
     }
     document.addEventListener('keydown', onKey);
@@ -211,6 +225,20 @@ export function App() {
         onExportMd={() => void doExport('md')}
         onExportPng={() => void doExportPng()}
         onNewStory={() => newStory('未命名故事', '')}
+        onSave={() => void saveNow()}
+      />
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+      <BookshelfPanel
+        collapsed={shelfCollapsed}
+        onToggle={() => setShelfCollapsed((v) => !v)}
+        onOpen={(id, t, treeJson) => {
+          try {
+            const parsed = JSON.parse(treeJson) as never;
+            loadStory(id, t, parsed);
+            setView('editor');
+          } catch { showToast('故事数据损坏'); }
+        }}
+        currentId={storyId}
       />
       <main className="workspace">
         {view === 'editor' && (
@@ -224,6 +252,7 @@ export function App() {
         {view === 'dashboard' && <DashboardView />}
         {view === 'settings' && <SettingsView />}
       </main>
+      </div>
       {pngPreview && (
         <div className="style-dialog-mask" onClick={() => setPngPreview(null)}>
           <div className="style-dialog" onClick={(e) => e.stopPropagation()}>
@@ -266,7 +295,6 @@ export function App() {
     </div>
   );
 }
-
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** 轻提示（替代系统弹窗） */

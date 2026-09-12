@@ -24,6 +24,7 @@ interface Props {
   onExportMd: () => void;
   onExportPng: () => void;
   onNewStory: () => void;
+  onSave: () => void;
 }
 
 export function TopBar({ onOpenWorldTree, onOpenDashboard, onOpenSettings, onExportJson, onExportTxt, onExportMd, onExportPng, onNewStory }: Props) {
@@ -68,6 +69,16 @@ export function TopBar({ onOpenWorldTree, onOpenDashboard, onOpenSettings, onExp
   return (
     <header className="topbar">
       {/* 九宫格菜单 */}
+      <button
+        className="grid-btn"
+        title="保存（Ctrl+S）"
+        style={{ marginRight: 0 }}
+        onClick={() => {
+          onSave();
+        }}
+      >
+        💾
+      </button>
       <button
         className="grid-btn"
         title="菜单"

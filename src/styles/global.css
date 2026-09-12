@@ -792,3 +792,95 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ---------- DCR⑤ 书架 ---------- */
+.shelf-toggle-collapsed {
+  width: 34px;
+  height: 100%;
+  border: 0;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 18px;
+  border-right: 1px solid var(--border);
+}
+.shelf-panel {
+  width: 230px;
+  flex: 0 0 230px;
+  border-right: 1px solid var(--border);
+  background: var(--card);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.shelf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--card);
+  z-index: 5;
+}
+.shelf-mini-btn {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.shelf-mini-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.shelf-mini-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.shelf-msg {
+  font-size: 12px;
+  color: var(--accent);
+  padding: 6px 12px;
+  word-break: break-all;
+}
+.shelf-folder {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 8px 12px 4px;
+  cursor: context-menu;
+}
+.shelf-story {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.shelf-story:hover {
+  background: var(--accent-soft);
+}
+.shelf-story.current {
+  background: var(--accent-soft);
+}
+.shelf-story.in-folder {
+  padding-left: 24px;
+}
+.shelf-story-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shelf-story-time {
+  font-size: 11px;
+  color: var(--sub);
+}

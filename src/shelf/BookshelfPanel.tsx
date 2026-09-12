@@ -8,13 +8,20 @@ import {
   dissolveFolder,
   renameStoryRow,
   setStoryFolder,
-  nextUntitledNumber,
   type ShelfFolder,
   type ShelfStory,
 } from './shelf';
 import { deserialize } from '../worldtree/tree';
 import { buildTxtExport } from '../export/exporters';
 import { zipSync } from 'fflate';
+
+
+async function deleteStoryRow(id: string): Promise<void> {
+  if (!(typeof globalThis !== 'undefined' && '__TAURI_INTERNALS__' in globalThis)) return;
+  const mod = await import('@tauri-apps/plugin-sql');
+  const db = await mod.default.load('sqlite:xiaomeng.db');
+  await db.execute('DELETE FROM stories WHERE id = $1', [id]);
+}
 
 interface Props {
   collapsed: boolean;
@@ -28,8 +35,6 @@ type MenuState =
   | { kind: 'none' }
   | { kind: 'story'; id: string; x: number; y: number }
   | { kind: 'folder'; id: string; name: string; x: number; y: number };
-
-type MultiAction = 'none' | 'selecting';
 
 export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props) {
   const [stories, setStories] = useState<ShelfStory[]>([]);
@@ -64,15 +69,7 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
   }, []);
 
   /** 保存：未命名自动编号 */
-  async function saveCurrent(currentId: string, currentTitle: string, treeJson: string, existingTitles: string[]): Promise<string> {
-    let finalTitle = currentTitle.trim();
-    if (!finalTitle || /^未命名$/.test(finalTitle)) {
-      finalTitle = `未命名${nextUntitledNumber(existingTitles)}`;
-    }
-    await import('./shelf').then((m) => m.saveToShelf(currentId, finalTitle, treeJson, null));
-    await refresh();
-    return finalTitle;
-  }
+
 
   async function doRename(): Promise<void> {
     if (!renaming || !renaming.value.trim()) {
@@ -88,12 +85,7 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
     await refresh();
   }
 
-  async function doDeleteStory(id: string): Promise<void> {
-    if (!IS_TAURI()) return;
-    const { default: sql } = await import('@tauri-apps/plugin-sql');
-    await sql.execute('DELETE FROM stories WHERE id = $1', [id]);
-    await refresh();
-  }
+
 
   async function makeFolder(): Promise<void> {
     const id = `folder_${Date.now().toString(36)}`;
@@ -249,8 +241,7 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
             className="dropdown-item"
             onClick={async () => {
               if (confirm('删除这本故事？（平行世界树一并删除，不可恢复）')) {
-                const { default: sql } = await import('@tauri-apps/plugin-sql');
-                await sql.execute('DELETE FROM stories WHERE id = $1', [menu.id]);
+                await deleteStoryRow(menu.id);
                 await refresh();
               }
               setMenu({ kind: 'none' });

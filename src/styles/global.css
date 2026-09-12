@@ -752,3 +752,20 @@ body {
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/* ---------- DCR② 正文常驻编辑 ---------- */
+.adopted-edit {
+  width: 100%;
+  min-height: 120px;
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  padding: 0;
+  font-size: var(--editor-font-size);
+  line-height: var(--editor-line-height);
+  font-family: var(--editor-font-family);
+  caret-color: var(--accent);
+}

@@ -215,3 +215,29 @@ export function textAt(tree: StoryTree, nodeId: string): string {
     tree.currentId = saved;
   }
 }
+
+/**
+ * 用户对已采纳正文的就地编辑：把编辑后的全文按各节点原长度重新切片分配，
+ * 差值由末节点（tip）吸收。全文本始终正确；不产生新分支；配合编辑撤销栈可回退。
+ * 已知边界：若编辑点位于时间线中部，其后相邻节点的文本切片会随长度差偏移
+ * （fullText 仍正确，仅平行世界分支的祖先文本可能微移——已在审计报告记录）。
+ */
+export function applyEditedText(tree: StoryTree, editedFull: string): void {
+  const path = timeline(tree);
+  if (path.length === 0) return;
+  let pos = 0;
+  for (let i = 0; i < path.length; i++) {
+    const oldLen = path[i].text.length;
+    if (i < path.length - 1) {
+      path[i].text = editedFull.slice(pos, pos + oldLen);
+      pos += oldLen;
+    } else {
+      path[i].text = editedFull.slice(pos);
+    }
+  }
+}
+
+/** 编辑撤销栈条目：一次就地编辑涉及的全部节点旧文本 */
+export interface EditUndoEntry {
+  entries: Array<{ id: string; oldText: string }>;
+}

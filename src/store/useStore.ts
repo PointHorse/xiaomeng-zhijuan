@@ -5,6 +5,7 @@
 import { create } from 'zustand';
 import {
   createTree,
+  applyEditedText,
   growWithCandidates,
   switchCandidate,
   moveTo,
@@ -14,6 +15,7 @@ import {
   fullText,
   currentNode,
   genId,
+  timeline,
   type Candidate,
   type StoryTree,
 } from '../worldtree/tree';
@@ -42,6 +44,11 @@ export interface AppState {
   candidates: Candidate[];
   /** 自动保存时间戳（ms），0 表示未保存过 */
   lastSavedAt: number;
+  /** DCR②：正文就地编辑的撤销栈（每项 = 一次提交的全部节点旧文本） */
+  editUndoStack: Array<Array<{ id: string; oldText: string }>>;
+  /** 编辑过正文但未撤销标记（Ctrl+Z 优先弹编辑栈） */
+  editAdoptedText: (newFull: string) => void;
+  undoEdit: () => void;
   /** 记忆截断提示 */
   memoryTruncated: boolean;
 
@@ -83,6 +90,27 @@ export const useStore = create<AppState>((set, get) => ({
   candidates: [],
   lastSavedAt: 0,
   memoryTruncated: false,
+  editUndoStack: [],
+
+  editAdoptedText: (newFull) => {
+    const t = get().tree;
+    const path = timeline(t);
+    const before = path.map((n) => ({ id: n.id, oldText: n.text }));
+    const after = path.map((n) => ({ id: n.id, oldText: '' }));
+    void after;
+    applyEditedText(t, newFull);
+    set({ tree: { ...t }, editUndoStack: [...get().editUndoStack.slice(-50), before] });
+  },
+  undoEdit: () => {
+    const stack = get().editUndoStack;
+    if (stack.length === 0) return;
+    const last = stack[stack.length - 1];
+    const t = get().tree;
+    for (const e of last) {
+      if (t.nodes[e.id]) t.nodes[e.id].text = e.oldText;
+    }
+    set({ tree: { ...t }, editUndoStack: stack.slice(0, -1) });
+  },
 
   newStory: (title, rootText) => {
     set({

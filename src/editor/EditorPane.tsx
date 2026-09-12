@@ -12,6 +12,7 @@ export function EditorPane() {
   const settings = useStore((s) => s.settings);
   const candidates = useStore((s) => s.candidates);
   const memoryTruncated = useStore((s) => s.memoryTruncated);
+  const editAdoptedText = useStore((s) => s.editAdoptedText);
   const confirmEditedText = useStore((s) => s.confirmEditedText);
   const revertRed = useStore((s) => s.revertRed);
   const t = useT();
@@ -22,6 +23,7 @@ export function EditorPane() {
 
   // 编辑态（修改红色文本）
   const [editing, setEditing] = useState(false);
+  const [liveCount, setCharCount] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
 
   const nodes = timeline(tree);
@@ -51,12 +53,17 @@ export function EditorPane() {
 
   return (
     <section className="editor-pane" ref={scrollRef}>
-      {/* 已采纳正文（深灰） */}
-      <article className="story-text">
-        {adoptedNodes.map((n) => (
-          <span key={n.id}>{n.text}</span>
-        ))}
-      </article>
+      {/* 已采纳正文（深灰，DCR② 全程可自由编辑） */}
+      <textarea
+        className="adopted-edit"
+        value={adoptedNodes.map((n) => n.text).join('')}
+        onChange={(e) => {
+          editAdoptedText(e.target.value);
+          setCharCount(e.target.value.length);
+        }}
+        spellCheck={false}
+        placeholder="写下故事开头…"
+      />
 
       {/* 红色未确认续写 */}
       {generating && (
@@ -189,6 +196,7 @@ export function EditorPane() {
       {!generating && candidates.length > 0 && redNode && !editing && (
         <div style={{ marginTop: 8, fontSize: 12, color: 'var(--sub)' }}>
           {t((d) => d.candidatesInRound, { n: candidates.length })}
+          {liveCount !== null && <span style={{ marginLeft: 10 }}>字数：{liveCount}</span>}
         </div>
       )}
     </section>

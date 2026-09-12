@@ -9,12 +9,12 @@ import {
   renameStoryRow,
   setStoryFolder,
   nextUntitledNumber,
-  zipFiles,
   type ShelfFolder,
   type ShelfStory,
 } from './shelf';
 import { deserialize } from '../worldtree/tree';
-import { buildTxtExport, buildJsonExport, buildMdExport } from '../export/exporters';
+import { buildTxtExport } from '../export/exporters';
+import { zipSync } from 'fflate';
 
 interface Props {
   collapsed: boolean;
@@ -142,7 +142,7 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
         /* 单本损坏跳过 */
       }
     }
-    const zipped = await zipFiles(files);
+    const zipped = zipSync(files);
     const { save } = await import('@tauri-apps/plugin-dialog');
     const path = await save({
       defaultPath: `${folderName}.zip`,

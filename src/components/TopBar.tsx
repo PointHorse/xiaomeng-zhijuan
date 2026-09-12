@@ -27,7 +27,7 @@ interface Props {
   onSave: () => void;
 }
 
-export function TopBar({ onOpenWorldTree, onOpenDashboard, onOpenSettings, onExportJson, onExportTxt, onExportMd, onExportPng, onNewStory }: Props) {
+export function TopBar({ onOpenWorldTree, onOpenDashboard, onOpenSettings, onExportJson, onExportTxt, onExportMd, onExportPng, onNewStory, onSave }: Props) {
   const title = useStore((s) => s.title);
   const setTitle = useStore((s) => s.setTitle);
   const tree = useStore((s) => s.tree);

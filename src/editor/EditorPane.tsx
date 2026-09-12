@@ -57,12 +57,6 @@ export function EditorPane() {
   }
 
   /** 撤回：删除最后一个 AI 节点 */
-  function handleRevert(): void {
-    revertRed();
-    setActionsVisible(false);
-  }
-
-  /** 保留：确认文本，隐藏操作按钮 */
   function handleKeep(): void {
     keepRed();
     setActionsVisible(false);

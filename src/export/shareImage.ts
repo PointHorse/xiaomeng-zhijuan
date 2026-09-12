@@ -6,7 +6,7 @@ import { fullText, timeline } from '../worldtree/tree';
 
 export function buildMdExport(title: string, tree: StoryTree): string {
   const nodes = timeline(tree);
-  const head = `# ${title}\n\n> 小梦织卷 · ${nodes.length} 个节点 · ${new Date().toLocaleDateString('zh-CN')}\n\n---\n\n`;
+  const head = `# ${title}\n\n> DreamCore-revival · ${nodes.length} 个节点 · ${new Date().toLocaleDateString('zh-CN')}\n\n---\n\n`;
   const body = fullText(tree)
     .split(/\n+/)
     .filter((p) => p.trim())
@@ -79,7 +79,7 @@ export function renderShareImage(opts: ShareImageOptions): HTMLCanvasElement {
   // 头部文字
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '600 40px "Microsoft YaHei", sans-serif';
-  ctx.fillText(title.slice(0, 20) || '小梦织卷', PAD, 86);
+  ctx.fillText(title.slice(0, 20) || 'DreamCore', PAD, 86);
   ctx.font = '300 20px "Microsoft YaHei", sans-serif';
   ctx.globalAlpha = 0.85;
   ctx.fillText('Xiaomeng Weaver · AI Story Continuation', PAD, 130);
@@ -106,10 +106,10 @@ export function renderShareImage(opts: ShareImageOptions): HTMLCanvasElement {
   const footY = H - FOOT_H + 46;
   ctx.fillStyle = dark ? '#FF7A6E' : '#F0655A';
   ctx.font = '600 20px "Microsoft YaHei", sans-serif';
-  ctx.fillText('小梦织卷', PAD, footY);
+  ctx.fillText('DreamCore', PAD, footY);
   ctx.fillStyle = dark ? '#9A9A9A' : '#909399';
   ctx.font = '400 16px "Microsoft YaHei", sans-serif';
-  ctx.fillText('AI 续写 · 平行世界 · 本地模型', PAD + 110, footY);
+  ctx.fillText('DCR · AI 续写 · 平行世界 · 本地模型', PAD + 100, footY);
   ctx.fillText('github.com/PointHorse/xiaomeng-zhijuan', PAD, footY + 28);
 
   return canvas;
@@ -119,7 +119,7 @@ export function renderShareImage(opts: ShareImageOptions): HTMLCanvasElement {
 export function downloadShareImage(opts: ShareImageOptions): void {
   const canvas = renderShareImage(opts);
   const link = document.createElement('a');
-  link.download = `${opts.title || '小梦织卷'}.png`;
+  link.download = `${opts.title || 'DreamCore'}.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
 }

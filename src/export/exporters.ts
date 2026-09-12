@@ -6,7 +6,7 @@ import type { StoryTree } from '../worldtree/tree';
 import { fullText, timeline, serialize } from '../worldtree/tree';
 
 export interface StoryExport {
-  app: 'xiaomeng-zhijuan';
+  app: 'dreamcore-revival';
   version: 1;
   exportedAt: string;
   title: string;
@@ -15,7 +15,7 @@ export interface StoryExport {
 
 export function buildJsonExport(title: string, tree: StoryTree): string {
   const payload: StoryExport = {
-    app: 'xiaomeng-zhijuan',
+    app: 'dreamcore-revival',
     version: 1,
     exportedAt: new Date().toISOString(),
     title,
@@ -35,8 +35,8 @@ export function buildTxtExport(title: string, tree: StoryTree): string {
 /** 导入 JSON（容错校验） */
 export function parseJsonExport(raw: string): { title: string; tree: StoryTree } {
   const obj = JSON.parse(raw) as Partial<StoryExport> & { tree?: StoryTree };
-  if (!obj || obj.app !== 'xiaomeng-zhijuan' || !obj.tree || typeof obj.title !== 'string') {
-    throw new Error('不是有效的小梦织卷导出文件');
+  if (!obj || obj.app !== 'dreamcore-revival' || !obj.tree || typeof obj.title !== 'string') {
+    throw new Error('不是有效的 DreamCore-revival 导出文件');
   }
   // 反序列化做二次校验
   serializeRoundtrip(obj.tree);

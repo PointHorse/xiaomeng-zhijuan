@@ -1,8 +1,8 @@
 {
-  "name": "xiaomeng-zhijuan",
+  "name": "dreamcore-revival",
   "private": true,
   "version": "0.1.0",
-  "description": "小梦织卷 — AI 小说续写桌面客户端",
+  "description": "DreamCore-revival (DCR) — AI 小说续写桌面客户端",
   "type": "module",
   "scripts": {
     "dev": "vite",

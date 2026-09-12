@@ -50,7 +50,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           }}
         >
           <div style={{ fontSize: 40 }}>🌙</div>
-          <div style={{ fontSize: 17, fontWeight: 600 }}>小梦做了一个噩梦，但你的故事安然无恙。</div>
+          <div style={{ fontSize: 17, fontWeight: 600 }}>DCR 做了一个噩梦，但你的故事安然无恙。</div>
           <div style={{ fontSize: 13, color: 'var(--sub, #909399)', maxWidth: 480, wordBreak: 'break-all' }}>
             {this.state.error.message}
           </div>

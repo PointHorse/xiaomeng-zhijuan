@@ -1,4 +1,4 @@
-//! 小梦织卷 · Tauri 入口（最薄封装）
+//! DreamCore-revival · Tauri 入口（最薄封装）
 //!
 //! Rust 侧只做三件事：
 //! 1. 注册官方插件（SQLite / 对话框 / HTTP 转发）
@@ -68,5 +68,5 @@ pub fn run() {
             Ok(())
         })
         .run(tauri::generate_context!())
-        .expect("小梦织卷启动失败");
+        .expect("DreamCore-revival 启动失败");
 }

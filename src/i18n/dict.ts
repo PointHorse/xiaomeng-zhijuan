@@ -139,7 +139,7 @@ export interface Dict {
 }
 
 export const zh: Dict = {
-  appName: '小梦织卷',
+  appName: 'DreamCore-revival',
   storyTitlePlaceholder: '未命名故事',
   charCount: '字数统计：{n} 字',
   lastSaved: '最后保存于 {t}',
@@ -263,7 +263,7 @@ export const zh: Dict = {
 };
 
 export const en: Dict = {
-  appName: 'Xiaomeng Weaver',
+  appName: 'DreamCore-revival',
   storyTitlePlaceholder: 'Untitled Story',
   charCount: 'Characters: {n}',
   lastSaved: 'Saved at {t}',

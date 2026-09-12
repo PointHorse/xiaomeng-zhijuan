@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { timeline } from '../worldtree/tree';
-import { UndoIcon, EditIcon, CheckIcon } from '../components/Icons';
+import { UndoIcon, EditIcon, CheckIcon, RefreshIcon } from '../components/Icons';
 import { useGenerate } from './useGenerate';
 import { useT } from '../i18n/useI18n';
 
@@ -15,7 +15,6 @@ export function EditorPane() {
   const editAdoptedText = useStore((s) => s.editAdoptedText);
   const confirmEditedText = useStore((s) => s.confirmEditedText);
   const revertRed = useStore((s) => s.revertRed);
-  const redConfirmed = useStore((s) => s.redConfirmed);
   const keepRed = useStore((s) => s.keepRed);
   const t = useT();
 
@@ -25,8 +24,8 @@ export function EditorPane() {
 
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
-  /** DCR fix：撤回/保留后隐藏工具条，新一轮生成时重置 */
-  const [toolbarDismissed, setToolbarDismissed] = useState(false);
+  /** 操作按钮可见性：点击撤回或保留后隐藏，新一轮生成时重置 */
+  const [actionsVisible, setActionsVisible] = useState(true);
 
   const nodes = timeline(tree);
   const lastNode = nodes[nodes.length - 1];
@@ -34,9 +33,8 @@ export function EditorPane() {
   const adoptedNodes = redNode ? nodes.slice(0, -1) : nodes;
 
   const generating = gen.phase === 'generating';
-  const showRed = (redNode && !generating && !redConfirmed && !toolbarDismissed) || (generating && gen.streamText);
-  const showToolbar = !generating && redNode && !editing && !redConfirmed && !toolbarDismissed;
-  const showInput = !generating && !showRed;
+  const showRedText = !generating && redNode && actionsVisible;
+  const showToolbar = showRedText && !editing;
 
   // 自动滚动到底部
   useEffect(() => {
@@ -44,9 +42,9 @@ export function EditorPane() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [gen.streamText, tree.currentId, lastNode?.text]);
 
-  // 新一轮生成开始时重置 toolbarDismissed
+  // 新一轮生成时重置
   useEffect(() => {
-    if (generating) setToolbarDismissed(false);
+    if (generating) setActionsVisible(true);
   }, [generating]);
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>): void {
@@ -56,6 +54,18 @@ export function EditorPane() {
       void generateFromInput(text);
       (e.currentTarget as HTMLTextAreaElement).value = '';
     }
+  }
+
+  /** 撤回：删除最后一个 AI 节点 */
+  function handleRevert(): void {
+    revertRed();
+    setActionsVisible(false);
+  }
+
+  /** 保留：确认文本，隐藏操作按钮 */
+  function handleKeep(): void {
+    keepRed();
+    setActionsVisible(false);
   }
 
   return (
@@ -69,17 +79,19 @@ export function EditorPane() {
         placeholder="写下故事开头…"
       />
 
-      {/* 红色未确认续写 */}
+      {/* 红色未确认续写（生成中流式） */}
       {generating && (
         <article className="story-text">
           <span className="red">{gen.streamText}</span>
           <span className="stream-caret" />
         </article>
       )}
-      {!generating && redNode && !editing && !toolbarDismissed && (
+
+      {/* 红色未确认续写（生成完毕） */}
+      {showRedText && !editing && (
         <article className="story-text">
-          <span className={redConfirmed ? '' : 'red'}>{redNode.text}</span>
-          {!redConfirmed && <span className="red-line" />}
+          <span className="red">{redNode?.text}</span>
+          <span className="red-line" />
         </article>
       )}
 
@@ -98,7 +110,7 @@ export function EditorPane() {
                 onClick={() => {
                   confirmEditedText(editValue);
                   setEditing(false);
-                  setToolbarDismissed(true);
+                  setActionsVisible(false);
                 }}
               >
                 <CheckIcon /> {t((d) => d.confirm)}
@@ -120,10 +132,10 @@ export function EditorPane() {
         <div className="cursor-toolbar">
           <div className="inner">
             <button
-              title="删除本次红色续写，回到生成前"
+              title="删除本次续写，回到生成前"
               onClick={() => {
                 setEditing(false);
-                setToolbarDismissed(true);
+                setActionsVisible(false);
                 revertRed();
               }}
             >
@@ -132,7 +144,7 @@ export function EditorPane() {
             <button
               title="转为可编辑态"
               onClick={() => {
-                setEditValue(redNode.text);
+                setEditValue(redNode?.text ?? '');
                 setEditing(true);
               }}
             >
@@ -140,10 +152,7 @@ export function EditorPane() {
             </button>
             <button
               title="确认当前内容，不再续写"
-              onClick={() => {
-                keepRed();
-                setToolbarDismissed(true);
-              }}
+              onClick={handleKeep}
             >
               ✓ 保留
             </button>
@@ -164,12 +173,7 @@ export function EditorPane() {
         <div className="error-card">
           ⚠ {t((d) => d.genFailed)}：{gen.errorMessage}
           <div className="retry">
-            <button
-              className="pill-btn"
-              onClick={() => {
-                void run();
-              }}
-            >
+            <button className="pill-btn" onClick={() => void run()}>
               {t((d) => d.retry)}
             </button>
           </div>
@@ -177,7 +181,7 @@ export function EditorPane() {
       )}
 
       {/* 用户输入区 */}
-      {showInput && (
+      {!generating && !showRedText && (
         <>
           <textarea
             ref={inputRef}
@@ -208,7 +212,7 @@ export function EditorPane() {
       )}
 
       {/* 候选数提示 */}
-      {!generating && candidates.length > 0 && redNode && !editing && !toolbarDismissed && (
+      {!generating && candidates.length > 0 && redNode && !editing && actionsVisible && (
         <div style={{ marginTop: 8, fontSize: 12, color: 'var(--sub)' }}>
           {t((d) => d.candidatesInRound, { n: candidates.length })}
         </div>

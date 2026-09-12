@@ -82,6 +82,7 @@ export interface PersistPayload {
   id: string;
   title: string;
   treeJson: string;
+  folderId?: string | null;
 }
 
 /** 防抖保存（5 秒）；内容未变化时跳过 */
@@ -94,10 +95,27 @@ export function scheduleSave(payload: PersistPayload, onSaved: () => void): void
   timer = setTimeout(async () => {
     try {
       const db = await getClient();
-      await db.execute(
-        'INSERT OR REPLACE INTO stories (id, title, tree_json, updated_at) VALUES ($1, $2, $3, $4)',
-        [payload.id, payload.title, payload.treeJson, Date.now()],
-      );
+      // 检测 folder_id 列是否存在（旧库兼容）
+      let hasFolderCol = false;
+      try {
+        const cols = await db.select<{ name: string }[]>('PRAGMA table_info(stories)');
+        hasFolderCol = Array.isArray(cols) && cols.some((c) => c.name === 'folder_id');
+      } catch {}
+      if (hasFolderCol) {
+        const existing = await db.select<{ folder_id: string | null }>(
+          'SELECT folder_id FROM stories WHERE id = $1', [payload.id]
+        );
+        const folderId = Array.isArray(existing) && existing.length > 0 ? existing[0].folder_id : null;
+        await db.execute(
+          'INSERT OR REPLACE INTO stories (id, title, tree_json, updated_at, folder_id) VALUES ($1, $2, $3, $4, $5)',
+          [payload.id, payload.title, payload.treeJson, Date.now(), folderId],
+        );
+      } else {
+        await db.execute(
+          'INSERT OR REPLACE INTO stories (id, title, tree_json, updated_at) VALUES ($1, $2, $3, $4)',
+          [payload.id, payload.title, payload.treeJson, Date.now()],
+        );
+      }
       onSaved();
     } catch (e) {
       console.error('自动保存失败', e);

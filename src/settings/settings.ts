@@ -30,7 +30,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   // 默认拉高生成长度：推理型模型（如 deepseek-v4-flash）会把预算先花在思考上
   temperature: 0.9,
   topP: 0.92,
-  maxTokens: 1000,
+  maxTokens: 4000,
   contextWindow: 8000,
   activeStyleId: 'style_builtin_default',
   styleSystemPrompt: '',

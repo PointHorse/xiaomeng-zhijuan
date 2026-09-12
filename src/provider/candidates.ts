@@ -33,7 +33,7 @@ interface RunResult {
 }
 
 function jitter(index: number, base: number): number {
-  const offsets = [-0.1, 0, 0.1];
+  const offsets = [-0.3, 0, 0.3];
   return Math.max(0, Math.min(2, +(base + offsets[index % 3]).toFixed(3)));
 }
 
@@ -54,10 +54,11 @@ async function runOne(
     if (signal.aborted) return { index, ok: false, error: '已取消' };
     let text = '';
     let failed: string | undefined;
+    const maxTok = attempt === 0 ? params.maxTokens : params.maxTokens * 2;
     try {
       await provider.generate({
         messages,
-        params: { ...params, temperature: jitter(index, params.temperature) },
+        params: { ...params, temperature: jitter(index, params.temperature), maxTokens: maxTok },
         signal,
         handlers: {
           onDelta: (d) => {

@@ -43,6 +43,7 @@ export function App() {
     s.setTitle(finalTitle);
     s.markSaved();
     showToast(`已保存「${finalTitle}」`);
+    window.dispatchEvent(new CustomEvent('shelf-refresh'));
   }
 
   // 初始化：建库、恢复设置（Key 为 DPAPI 密文则解密）与最近故事、首启探测

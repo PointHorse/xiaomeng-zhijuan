@@ -57,6 +57,11 @@ export function BookshelfPanel({ collapsed, onToggle, onOpen, currentId }: Props
 
   useEffect(() => {
     void refresh();
+    // DCR⑤fix：面板展开时 + 每 15 秒自动刷新（防保存后不更新）
+    const interval = setInterval(() => { if (!collapsed) void refresh(); }, 15000);
+    const onRefresh = () => void refresh();
+    window.addEventListener('shelf-refresh', onRefresh);
+    return () => { clearInterval(interval); window.removeEventListener('shelf-refresh', onRefresh); };
   }, [collapsed]);
 
   useEffect(() => {

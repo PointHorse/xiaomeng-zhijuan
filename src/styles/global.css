@@ -897,3 +897,192 @@ body {
   border-radius: 6px;
   padding: 4px 10px;
 }
+
+
+/* ============================================================
+   移动端适配（≤768px）— 参照彩云小梦手机版
+   单列布局 · 候选栏变底部面板 · 顶栏紧凑
+   ============================================================ */
+@media (max-width: 768px) {
+  /* 顶栏：紧凑单行 */
+  .topbar {
+    height: auto;
+    min-height: 56px;
+    flex-wrap: wrap;
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  .topbar-title-block {
+    min-width: 120px;
+    flex: 1;
+  }
+  .topbar-title {
+    font-size: 15px;
+    max-width: 100%;
+  }
+  .topbar-meta {
+    font-size: 11px;
+    gap: 8px;
+  }
+  .topbar-right {
+    gap: 4px;
+  }
+  .icon-btn, .avatar {
+    width: 30px;
+    height: 30px;
+  }
+  .style-pill {
+    padding: 5px 10px;
+    font-size: 12px;
+    max-width: 120px;
+  }
+  .topbar-model {
+    display: none; /* 移动端隐藏模型名（省空间） */
+  }
+  .grid-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* 双栏 → 单列 */
+  .workspace {
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .editor-pane {
+    flex: 1;
+    max-width: 100%;
+    padding: 14px 16px 180px; /* 底部留候选抽屉空间 */
+    overflow-y: auto;
+  }
+  .editor-divider {
+    display: none;
+  }
+
+  /* 候选栏 → 底部抽屉（固定在底部） */
+  .candidate-pane {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--card);
+    border-top: 2px solid var(--accent);
+    border-radius: 16px 16px 0 0;
+    max-height: 45vh;
+    overflow-y: auto;
+    padding: 14px 16px 16px;
+    box-shadow: 0 -6px 30px rgba(240, 101, 90, 0.15);
+  }
+  .candidate-head h2 {
+    font-size: 17px;
+  }
+  .candidate-head .sub {
+    font-size: 11.5px;
+  }
+  .pill-btn {
+    padding: 7px 16px;
+    font-size: 13px;
+  }
+  .candidate-card {
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .cand-text {
+    font-size: 14px;
+    line-height: 1.7;
+    -webkit-line-clamp: 4;
+  }
+
+  /* 编辑器：正文字号稍小 */
+  .story-text, .adopted-edit {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+  .user-input, .edit-area {
+    font-size: 16px;
+  }
+
+  /* 工具条：固定在正文下方 */
+  .cursor-toolbar {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin-top: 8px;
+  }
+  .cursor-toolbar button {
+    padding: 9px 16px;
+    font-size: 13px;
+  }
+
+  /* 骨架屏紧凑 */
+  .skeleton-card {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  /* 设置页紧凑 */
+  .settings-page {
+    padding: 20px 14px 60px;
+  }
+  .field-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .field-row label {
+    flex: none;
+  }
+  .field-row input[type='text'],
+  .field-row input[type='password'],
+  .field-row input[type='number'],
+  .field-row select {
+    width: 100%;
+  }
+
+  /* 世界树/仪表盘紧凑 */
+  .worldtree-page, .dashboard-view {
+    padding: 16px 12px 60px;
+  }
+  .dash-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* 书架全宽 */
+  .shelf-panel {
+    width: 100%;
+    flex: 0 0 100%;
+  }
+
+  /* 风格胶囊：顶栏紧凑 */
+  .style-pill {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  /* 提示条紧凑 */
+  .hint-toast {
+    right: 8px;
+    left: 8px;
+    bottom: 8px;
+    font-size: 12px;
+    text-align: center;
+  }
+}
+
+/* 超窄屏（<400px）进一步紧凑 */
+@media (max-width: 400px) {
+  .topbar-title {
+    font-size: 13px;
+  }
+  .cursor-toolbar button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .dash-cards {
+    grid-template-columns: 1fr;
+  }
+}

@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { SheetPortal } from './SheetPortal';
+import { TypographySheet } from './TypographySheet';
 import type { MobilePage } from './MobileShell';
 import { showToast } from '../components/toast';
 
@@ -17,6 +18,7 @@ interface Props {
 export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
   const [moreOpen, setMoreOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
+  const [typoOpen, setTypoOpen] = useState(false);
   const settings = useStore((s) => s.settings);
   const setSettings = useStore((s) => s.setSettings);
   const styles = (settings as { styles?: Array<{ id: string; name: string }> }).styles ?? [];
@@ -67,8 +69,15 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
 
       {/* 更多菜单 Sheet（§2）：保存、字号与排版、明暗主题、平行世界树、仪表盘、模型设置、导出长图、设置 */}
       <SheetPortal open={moreOpen} onClose={() => setMoreOpen(false)} title="更多">
-        <MoreMenu onClose={() => setMoreOpen(false)} onOpenPage={onOpenPage} onModel={() => setModelOpen(true)} />
+        <MoreMenu
+          onClose={() => setMoreOpen(false)}
+          onOpenPage={onOpenPage}
+          onModel={() => setModelOpen(true)}
+          onTypography={() => setTypoOpen(true)}
+        />
       </SheetPortal>
+
+      <TypographySheet open={typoOpen} onClose={() => setTypoOpen(false)} />
     </header>
   );
 }
@@ -77,10 +86,12 @@ function MoreMenu({
   onClose,
   onOpenPage,
   onModel,
+  onTypography,
 }: {
   onClose: () => void;
   onOpenPage: (p: MobilePage) => void;
   onModel: () => void;
+  onTypography: () => void;
 }): JSX.Element {
   const isDark = document.documentElement.classList.contains('dark');
   return (
@@ -91,7 +102,10 @@ function MoreMenu({
       >
         💾 保存
       </button>
-      <button className="msheet-row" onClick={() => { onOpenPage('settings'); onClose(); }}>
+      <button
+        className="msheet-row"
+        onClick={() => { onTypography(); onClose(); }}
+      >
         🅰 字号与排版
       </button>
       <button

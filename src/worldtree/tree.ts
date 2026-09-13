@@ -23,6 +23,8 @@ export interface StoryNode {
   candidates: Candidate[];
   chosenCandidateId: string | null;
   source: NodeSource;
+  /** AI 节点被用户点「保留/确认」后置 true：此后按已采纳正文渲染，不再显示红色与工具条 */
+  confirmed?: boolean;
   createdAt: number;
 }
 

@@ -144,7 +144,13 @@ export const useStore = create<AppState>((set, get) => ({
   markSaved: () => set({ lastSavedAt: Date.now() }),
 
   beginGenerate: () => set({ gen: { phase: 'generating', streamText: '', errorMessage: '' }, candidates: [], redConfirmed: false }),
-  keepRed: () => set({ redConfirmed: true }),
+  keepRed: () => {
+    const t = get().tree;
+    const node = currentNode(t);
+    // 保留 = 确认当前 AI 节点：转为已采纳正文（深灰），不再是红色待确认
+    if (node && node.source === 'ai') node.confirmed = true;
+    set({ tree: { ...t }, redConfirmed: true });
+  },
   appendStream: (delta) => set({ gen: { ...get().gen, streamText: get().gen.streamText + delta } }),
   finishGenerate: (candidates) => {
     const t = get().tree;
@@ -157,8 +163,9 @@ export const useStore = create<AppState>((set, get) => ({
     const t = get().tree;
     const node = currentNode(t);
     if (node && node.source === 'ai') {
-      // 修改确认：只改当前 AI 节点文本
+      // 修改确认：只改当前 AI 节点文本，并转为已采纳正文
       node.text = text;
+      node.confirmed = true;
       set({ tree: { ...t } });
     } else {
       appendUserText(t, text);

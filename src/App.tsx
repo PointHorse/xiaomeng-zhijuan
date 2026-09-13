@@ -124,17 +124,10 @@ export function App() {
       }
       // DCR⑦：水合完成后才允许设置持久化（防止挂载时默认值覆盖存储）
       hydratedRef.current = true;
-      // 确保始终有 storyId（否则自动保存/书架全部失效）
+      // 确保始终有 storyId（否则自动保存/书架全部失效）。
+      // store 初始状态已自带空树，这里只补 id；重建树会覆盖 init await 期间用户已输入的内容。
       if (!useStore.getState().storyId) {
-        const genId = `story_${Date.now().toString(36)}`;
-        useStore.setState({
-          storyId: genId,
-          title: `未命名故事`,
-          tree: {
-            nodes: { [genId]: { id: genId, parentId: null, text: '', candidates: [], chosenCandidateId: null, source: 'user', createdAt: Date.now() } },
-            rootId: genId, currentId: genId, history: [genId], historyIndex: 0,
-          },
-        });
+        useStore.setState({ storyId: `story_${Date.now().toString(36)}` });
       }
     })();
     return watchSystemTheme(() => applyTheme(useStore.getState().settings.theme));
@@ -172,7 +165,11 @@ export function App() {
     const timer = setTimeout(() => {
       scheduleSave(
         { id: storyId, title, treeJson: JSON.stringify(tree) },
-        () => useStore.getState().markSaved(),
+        () => {
+          useStore.getState().markSaved();
+          // 通知书架面板立即刷新（否则要等 15 秒轮询）
+          window.dispatchEvent(new CustomEvent('shelf-refresh'));
+        },
       );
     }, 5000);
     return () => clearTimeout(timer);

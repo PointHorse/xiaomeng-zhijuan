@@ -29,7 +29,8 @@ export function EditorPane() {
 
   const nodes = timeline(tree);
   const lastNode = nodes[nodes.length - 1];
-  const redNode = lastNode && lastNode.source === 'ai' ? lastNode : null;
+  // 红色待确认续写 = 最后一个「未被保留/确认」的 AI 节点；已确认的归入正文（深灰）
+  const redNode = lastNode && lastNode.source === 'ai' && !lastNode.confirmed ? lastNode : null;
   const adoptedNodes = redNode ? nodes.slice(0, -1) : nodes;
 
   const generating = gen.phase === 'generating';

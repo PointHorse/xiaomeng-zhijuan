@@ -155,3 +155,12 @@ export async function saveToShelf(
     [storyId, title, treeJson, Date.now(), folderId],
   );
 }
+
+/** 删除书架条目（移动端多选删除） */
+export async function deleteStories(ids: string[]): Promise<void> {
+  if (!IS_TAURI || ids.length === 0) return;
+  const db = await getClient();
+  for (const id of ids) {
+    await db.execute('DELETE FROM stories WHERE id = $1', [id]);
+  }
+}

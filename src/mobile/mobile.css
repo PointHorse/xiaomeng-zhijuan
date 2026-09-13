@@ -1,0 +1,624 @@
+/* ============================================================
+   DreamCore-revival · 移动端壳层样式（§0–§5）
+   仅移动壳使用；桌面样式 global.css 不受影响。
+   色板全部引用 styles/tokens.css 设计令牌。
+   ============================================================ */
+
+/* ---------- 壳层根 ---------- */
+.mshell {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  /* §1 安全区：状态栏让位（Android 默认不延伸，env 为 0 时无副作用） */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mpage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- 顶栏（§2，单行 56dp） ---------- */
+.mtopbar {
+  height: 56px;
+  flex: 0 0 56px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.mtopbar .micon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 22px;
+  border-radius: 12px;
+  padding: 0;
+  cursor: pointer;
+}
+.mtopbar .micon-btn:active {
+  background: var(--accent-soft);
+}
+
+/* 居中标题区：弹性占据中部，文字居中 */
+.mtopbar-center {
+  flex: 1;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* 珊瑚红胶囊：模型/风格选择（参照图 1「小梦0号」按钮） */
+.mtopbar-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 40vw;
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 16px 4px 16px 4px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mtopbar-capsule .cap-caret {
+  font-size: 11px;
+  opacity: 0.9;
+}
+.mtopbar-capsule:active {
+  background: var(--accent-hover);
+}
+
+/* ---------- 编辑页（§3） ---------- */
+.meditor {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 18px;
+  position: relative;
+}
+
+.mtitle-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 26px;
+  font-weight: 600;
+  padding: 10px 0 2px;
+  min-height: 44px;
+}
+.mtitle-input::placeholder {
+  color: var(--sub);
+  opacity: 0.55;
+}
+
+.mmeta-line {
+  font-size: 12px;
+  color: var(--sub);
+  padding: 2px 0 6px;
+  display: flex;
+  gap: 12px;
+}
+
+/* 正文滚动容器：全屏主体 */
+.mbody-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* 键盘弹出时底部留白，光标不被遮挡 */
+  padding-bottom: 120px;
+}
+
+.mbody-text {
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--editor-font-family);
+  font-size: var(--editor-font-size);
+  line-height: 1.8;
+  /* 自适应内容高度：由 JS 同步 scrollHeight */
+  overflow: hidden;
+  min-height: 60vh;
+  padding: 0;
+}
+.mbody-text::placeholder {
+  color: var(--sub);
+  opacity: 0.6;
+}
+
+/* 红色未确认续写（沿用桌面语义：珊瑚红正文 + 红色游标线） */
+.mred-text {
+  color: var(--accent);
+  font-family: var(--editor-font-family);
+  font-size: var(--editor-font-size);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.mred-line {
+  display: block;
+  height: 2px;
+  background: var(--cursor-line);
+  border-radius: 1px;
+  margin-top: 2px;
+}
+
+/* 右对齐红色胶囊工具条：紧贴游标线下方，随正文滚动 */
+.mred-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 0 4px;
+}
+.mred-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+.mred-toolbar button:active {
+  background: var(--accent-hover);
+}
+
+/* 生成中流式红字光标 */
+.mstream-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--accent);
+  vertical-align: -0.15em;
+  margin-left: 2px;
+  animation: mcaret-blink 1s steps(1) infinite;
+}
+@keyframes mcaret-blink {
+  50% { opacity: 0; }
+}
+
+/* ---------- 悬浮 AI 球（§3 右缘主触发） ---------- */
+.mai-ball {
+  position: fixed;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 20px;
+  box-shadow: 0 4px 14px rgba(240, 101, 90, 0.4);
+  cursor: pointer;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mai-ball:active {
+  background: var(--accent-hover);
+}
+.mai-ball.generating {
+  animation: mball-breathe 1.6s ease-in-out infinite;
+}
+@keyframes mball-breathe {
+  0%, 100% { box-shadow: 0 4px 14px rgba(240, 101, 90, 0.35); transform: translateY(-50%) scale(1); }
+  50% { box-shadow: 0 4px 22px rgba(240, 101, 90, 0.65); transform: translateY(-50%) scale(1.08); }
+}
+
+/* ---------- 底部弹层 Sheet（§1 通用） ---------- */
+.msheet-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+.msheet {
+  width: 100%;
+  background: var(--card);
+  border-radius: 16px 16px 0 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
+  transition: transform 0.22s ease-out;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.18);
+}
+.msheet-grip {
+  padding: 8px 16px 6px;
+  touch-action: none;
+  cursor: grab;
+  flex: 0 0 auto;
+}
+.msheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  margin: 0 auto;
+}
+.msheet-title {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 0 2px;
+  color: var(--text);
+}
+.msheet-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 16px 16px;
+}
+
+/* Sheet 内菜单行（更多菜单/操作菜单） */
+.msheet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  text-align: left;
+  padding: 0 4px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.msheet-row:active {
+  background: var(--accent-soft);
+}
+.msheet-row.danger {
+  color: var(--accent-text);
+}
+.msheet-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+/* Sheet 内表单字段（排版/模型设置等） */
+.mfield {
+  padding: 10px 0;
+}
+.mfield label {
+  display: block;
+  font-size: 13px;
+  color: var(--sub);
+  margin-bottom: 6px;
+}
+.mfield input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.mfield input[type='text'],
+.mfield input[type='password'],
+.mfield input[type='number'],
+.mfield select {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  padding: 0 12px;
+  outline: none;
+}
+.mfield input:focus,
+.mfield select:focus {
+  border-color: var(--accent);
+}
+.mprimary-btn {
+  width: 100%;
+  height: 46px;
+  border: none;
+  border-radius: 23px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.mprimary-btn:disabled {
+  opacity: 0.55;
+}
+
+/* ---------- 候选抽屉 CandidateSheet（§4） ---------- */
+.mcsheet {
+  height: 40%;
+}
+.mcsheet.expanded {
+  height: 75%;
+}
+.mcsheet.collapsed {
+  height: 64px;
+}
+.mcsheet-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px 8px;
+  flex: 0 0 auto;
+}
+.mcsheet-head .mcs-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.mcsheet-head .pill-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--accent);
+  border-radius: 17px;
+  background: var(--bg);
+  color: var(--accent-text);
+  font-size: 14px;
+  cursor: pointer;
+}
+.mcsheet-head .pill-refresh:disabled {
+  opacity: 0.5;
+}
+.mcsheet-head .mcs-close {
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--sub);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* 横向卡片轮播 */
+.mcs-carousel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 12px;
+  padding: 4px 16px 8px;
+  scrollbar-width: none;
+}
+.mcs-carousel::-webkit-scrollbar {
+  display: none;
+}
+.mcs-card {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text);
+  overflow-y: auto;
+  cursor: pointer;
+  position: relative;
+}
+/* 当前采纳卡片：左侧红竖条 + 浅红底 */
+.mcs-card.adopted {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.mcs-card.adopted::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+/* 页码圆点 */
+.mcs-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 2px 0 10px;
+  flex: 0 0 auto;
+}
+.mcs-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.15s;
+}
+.mcs-dots span.on {
+  background: var(--accent);
+}
+
+/* 骨架屏（生成中） */
+.mcs-skeleton {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.mcs-skeleton .sk-line {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--skeleton);
+  margin: 10px 0;
+}
+.mcs-skeleton .sk-line.short {
+  width: 60%;
+}
+
+/* ---------- 书架页（§5） ---------- */
+.mshelf-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 16px 24px;
+}
+.mshelf-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+  margin-bottom: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  min-height: 56px;
+}
+.mshelf-row.checked {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.mshelf-row .mrow-main {
+  flex: 1;
+  min-width: 0;
+}
+.mshelf-row .mrow-title {
+  font-size: 16px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mshelf-row .mrow-sub {
+  font-size: 12px;
+  color: var(--sub);
+  margin-top: 2px;
+  display: flex;
+  gap: 10px;
+}
+.mshelf-row input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  flex: 0 0 auto;
+}
+.mshelf-empty {
+  text-align: center;
+  color: var(--sub);
+  padding: 60px 0;
+  font-size: 14px;
+  line-height: 2;
+}
+.mshelf-count {
+  font-size: 13px;
+  color: var(--sub);
+  padding: 8px 18px 4px;
+}
+/* 多选模式底部操作条 */
+.mshelf-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+.mshelf-actions button {
+  flex: 1;
+  height: 44px;
+  border: none;
+  border-radius: 22px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+}
+.mshelf-actions button.danger {
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+/* ---------- 全屏功能页（世界树/仪表盘/设置：复用桌面组件 + 返回头） ---------- */
+.msubpage-head {
+  height: 56px;
+  flex: 0 0 56px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  border-bottom: 1px solid var(--border);
+}
+.msubpage-head .micon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
+}
+.msubpage-head .msub-title {
+  flex: 1;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  margin-right: 44px; /* 平衡返回按钮宽度，标题视觉居中 */
+}
+.msubpage-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+/* 桌面组件在窄屏下的最小适配（设置/世界树/仪表盘内部布局） */
+.msubpage-body .workspace,
+.msubpage-body main {
+  height: 100%;
+}

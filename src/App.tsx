@@ -7,7 +7,8 @@ import { CandidateBar } from './editor/CandidateBar';
 import { WorldTreeView } from './worldtree/WorldTreeView';
 import { DashboardView } from './dashboard/DashboardView';
 import { BookshelfPanel } from './shelf/BookshelfPanel';
-import { initShelfSchema, saveToShelf, listShelfStories, nextUntitledNumber } from './shelf/shelf';
+import { initShelfSchema } from './shelf/shelf';
+import { showToast } from './components/toast';
 import { SettingsView, autoDetectLocal } from './settings/SettingsView';
 import { applyTheme, applyTypography, watchSystemTheme } from './settings/theme';
 import { initSchema, scheduleSave, loadStoryTree, listStories, writeExportFile, saveSettingsJson, loadSettingsJson } from './store/persist';
@@ -15,6 +16,9 @@ import { buildJsonExport, buildTxtExport } from './export/exporters';
 import { buildMdExport, renderAndSaveShareImage } from './export/shareImage';
 import { useGenerate } from './editor/useGenerate';
 import { invoke } from '@tauri-apps/api/core';
+import { useIsMobile } from './mobile/platform';
+import { MobileShell } from './mobile/MobileShell';
+import { saveNowToShelf } from './shelf/saveNow';
 
 export function App() {
   const hydratedRef = useRef(false);
@@ -30,26 +34,9 @@ export function App() {
   const setSettings = useStore((s) => s.setSettings);
   const { run, cancel } = useGenerate();
   const [shelfCollapsed, setShelfCollapsed] = useState(false);
+  const isMobile = useIsMobile();
 
-  async function saveNow(): Promise<void> {
-    const s = useStore.getState();
-    // DCR fix：storyId 为空时自动创建（用户直接开始写而未走新建流程）
-    let sid = s.storyId;
-    if (!sid) {
-      sid = `story_${Date.now().toString(36)}`;
-      useStore.setState({ storyId: sid });
-    }
-    const existing = await listShelfStories().catch(() => []);
-    let finalTitle = s.title.trim();
-    if (!finalTitle || finalTitle === '未命名故事') {
-      finalTitle = `未命名${nextUntitledNumber(existing.map((x) => x.title))}`;
-    }
-    await saveToShelf(sid, finalTitle, JSON.stringify(s.tree), existing.find((x) => x.id === sid)?.folderId ?? null);
-    s.setTitle(finalTitle);
-    s.markSaved();
-    showToast(`已保存「${finalTitle}」`);
-    window.dispatchEvent(new CustomEvent('shelf-refresh'));
-  }
+  const saveNow = saveNowToShelf;
 
   // 初始化：建库、恢复设置（Key 为 DPAPI 密文则解密）与最近故事、首启探测
   useEffect(() => {
@@ -237,6 +224,11 @@ export function App() {
     }
   }
 
+  // 移动端壳层（§0）：窗口 < 768px 或 Android 平台；与桌面共享全部业务逻辑
+  if (isMobile) {
+    return <MobileShell />;
+  }
+
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <TopBar
@@ -321,21 +313,6 @@ export function App() {
     </div>
   );
 }
-let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** 轻提示（替代系统弹窗） */
-export function showToast(message: string): void {
-  let el = document.getElementById('xm-toast');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'xm-toast';
-    el.className = 'hint-toast';
-    document.body.appendChild(el);
-  }
-  el.textContent = message;
-  el.style.display = 'block';
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    if (el) el.style.display = 'none';
-  }, 5000);
-}
+// toast 实现已抽到 components/toast（桌面/移动共用）；此处保留导出兼容旧引用
+export { showToast } from './components/toast';

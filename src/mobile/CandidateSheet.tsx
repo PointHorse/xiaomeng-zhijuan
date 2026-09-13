@@ -56,14 +56,12 @@ export function CandidateSheet() {
   const startY = useRef<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  // 生成开始或出现候选 → 自动升起（已展开则保持）
-  const wasBusy = useRef(false);
+  // 每轮生成开始（含「换一批」）→ 抽屉自动升起（§4）
+  const wasGenerating = useRef(false);
   useEffect(() => {
-    const busy = generating || candidates.length > 0;
-    if (busy && !wasBusy.current && snap === 'closed') setSnap('open');
-    wasBusy.current = busy;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [generating, candidates.length]);
+    if (generating && !wasGenerating.current) setSnap('open');
+    wasGenerating.current = generating;
+  }, [generating]);
 
   // 轮播页码同步（§4 页码圆点）
   useEffect(() => {
@@ -125,7 +123,7 @@ export function CandidateSheet() {
       >
         <div className="msheet-handle" style={{ margin: '0 8px 0 0' }} />
         <div className="mcs-title">🤖 {mobileCopy.candidateTitle}</div>
-        <button className="pill-refresh" disabled={generating} onClick={() => void run()}>
+        <button className="pill-refresh hit-44" disabled={generating} onClick={() => void run()}>
           ⟳ 换一批
         </button>
         <button className="mcs-close" aria-label="关闭" onClick={() => setSnap('closed')}>

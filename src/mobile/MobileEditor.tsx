@@ -55,7 +55,13 @@ export function MobileEditor() {
     }
   }, [adoptedText]);
 
-  // 生成完成（红段出现）时滚动让红段可见
+  // 生成中跟随流式输出滚动到底部；生成完成（红段出现）滚动让红段可见
+  useEffect(() => {
+    if (generating && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [generating, gen.streamText]);
+
   useEffect(() => {
     if (!generating && redNode && redRef.current && scrollRef.current) {
       redRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -164,6 +170,22 @@ export function MobileEditor() {
           )}
         </div>
       </div>
+
+      {/* 错误卡片 + 重试 */}
+      {!generating && gen.phase === 'error' && (
+        <div style={{ margin: '10px 0', padding: '12px 14px', background: 'var(--accent-soft)', borderRadius: 12, fontSize: 14, lineHeight: 1.8, color: 'var(--accent-text)' }}>
+          ⚠ 生成失败：{gen.errorMessage}
+          <div style={{ marginTop: 8 }}>
+            <button
+              className="hit-44"
+              onClick={() => void run()}
+              style={{ height: 36, padding: '0 16px', border: 'none', borderRadius: 18, background: 'var(--accent)', color: '#fff', fontSize: 14 }}
+            >
+              重试
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 右缘悬浮 AI 球（§3）：主触发入口；生成中呼吸 + 轻点取消 */}
       <button

@@ -192,6 +192,13 @@
   color: #fff;
   font-size: 14px;
   cursor: pointer;
+  position: relative;
+}
+/* §1 触控区补足 44dp：视觉 36px + 透明外扩热区 */
+.mred-toolbar button::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
 }
 .mred-toolbar button:active {
   background: var(--accent-hover);
@@ -209,6 +216,16 @@
 }
 @keyframes mcaret-blink {
   50% { opacity: 0; }
+}
+
+/* §1 最小触控区 44dp：视觉小圆角按钮用透明外扩热区补足 */
+.hit-44 {
+  position: relative;
+}
+.hit-44::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
 }
 
 /* ---------- 悬浮 AI 球（§3 右缘主触发） ---------- */

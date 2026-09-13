@@ -34,7 +34,7 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
         📚
       </button>
       <div className="mtopbar-center">{activeStyle ? activeStyle.name : 'DreamCore'}</div>
-      <button className="mtopbar-capsule" onClick={() => setModelOpen(true)}>
+      <button className="mtopbar-capsule hit-44" onClick={() => setModelOpen(true)}>
         <span className="cap-label">⚡ {settings.model || 'mock'}</span>
         <span className="cap-caret">▾</span>
       </button>

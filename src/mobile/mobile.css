@@ -148,7 +148,8 @@
   line-height: 1.8;
   /* 自适应内容高度：由 JS 同步 scrollHeight */
   overflow: hidden;
-  min-height: 60vh;
+  /* 高度纯随内容（JS 同步 scrollHeight）；空白区点击由 mbody-scroll 聚焦兜底 */
+  min-height: 60px;
   padding: 0;
 }
 .mbody-text::placeholder {
@@ -164,6 +165,8 @@
   line-height: 1.8;
   white-space: pre-wrap;
   word-break: break-word;
+  /* 抽屉升起时 scrollIntoView 让红段完整露在抽屉上方（§4） */
+  scroll-margin-bottom: 45vh;
 }
 .mred-line {
   display: block;
@@ -232,7 +235,7 @@
 .mai-ball {
   position: fixed;
   right: 14px;
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
   width: 48px;
   height: 48px;
@@ -272,7 +275,8 @@
   width: 100%;
   background: var(--card);
   border-radius: 16px 16px 0 0;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* Android 手势导航栏 overlay 让位 */
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   min-height: 120px;
@@ -407,6 +411,9 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .mcsheet-head .pill-refresh {
   display: inline-flex;

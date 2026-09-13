@@ -64,7 +64,13 @@ export function MobileEditor() {
 
   useEffect(() => {
     if (!generating && redNode && redRef.current && scrollRef.current) {
-      redRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      // 候选抽屉约 40% 视口高：把红段底部滚到抽屉上缘之上，完整可见（§4）
+      const sc = scrollRef.current;
+      const scRect = sc.getBoundingClientRect();
+      const redRect = redRef.current.getBoundingClientRect();
+      const drawerH = window.innerHeight * 0.42;
+      const delta = redRect.bottom - (scRect.bottom - drawerH);
+      if (delta > 0) sc.scrollBy({ top: delta, behavior: 'smooth' });
     }
   }, [generating, redNode?.id]);
 
@@ -91,7 +97,14 @@ export function MobileEditor() {
           {lastSavedAt > 0 && <span>{mobileCopy.lastSavedAt.replace('{t}', formatTime(lastSavedAt))}</span>}
         </div>
 
-        <div className="mbody-scroll" ref={scrollRef}>
+        <div
+          className="mbody-scroll"
+          ref={scrollRef}
+          onClick={(e) => {
+            // 点正文区空白也聚焦输入（textarea 缩短后下方留白）
+            if (e.target === e.currentTarget) bodyRef.current?.focus();
+          }}
+        >
           {/* 已采纳正文：直接可编辑，无虚线框 */}
           <textarea
             ref={bodyRef}

@@ -80,6 +80,10 @@ export function createOpenAIProvider(cfg: ProviderConfig): Provider {
           headers: {
             'Content-Type': 'application/json',
             ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}),
+            // 空 Origin：插件（需 unsafe-headers feature）会在 Rust 侧移除该头。
+            // 否则 tauri-plugin-http 自动注入 Origin: http://tauri.localhost，
+            // 部分中转站的 CSRF 校验会对带陌生 Origin 的 POST 返回 403。
+            Origin: '',
           },
           body: JSON.stringify({
             model: cfg.model,

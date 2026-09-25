@@ -10,6 +10,7 @@ import { timeline } from '../worldtree/tree';
 import { useGenerate } from '../editor/useGenerate';
 import { Button } from './components/Button';
 import { haptic } from './components/useHaptics';
+import { genLoadingPhase } from './components/loading';
 import { mobileCopy } from './copy';
 
 function formatTime(ms: number): string {
@@ -47,6 +48,7 @@ export function MobileEditor() {
   const charCount = adoptedText.length + (redNode?.text.length ?? 0);
 
   const generating = gen.phase === 'generating';
+  const phase = genLoadingPhase(generating, gen.streamText);
 
   // 正文 textarea 自适应内容高度
   useEffect(() => {
@@ -118,11 +120,26 @@ export function MobileEditor() {
             spellCheck={false}
           />
 
-          {/* 生成中：流式红字 */}
+          {/* 生成中：模糊占位（扫光）→ 流式红字渐显 */}
           {generating && (
-            <div className="mred-text">
-              {gen.streamText}
-              <span className="mstream-caret" />
+            <div className="mgen-area">
+              {phase !== 'idle' && (
+                <div
+                  className={`skel-wrap ${phase === 'resolving' ? 'is-resolving mgen-skel-top' : ''}`}
+                  aria-hidden="true"
+                >
+                  <div className="skel-line" style={{ width: '92%' }} />
+                  <div className="skel-line" />
+                  <div className="skel-line" />
+                  <div className="skel-line" style={{ width: '55%' }} />
+                </div>
+              )}
+              {phase === 'resolving' && (
+                <div className="mred-text">
+                  {gen.streamText}
+                  <span className="mstream-caret" />
+                </div>
+              )}
             </div>
           )}
 

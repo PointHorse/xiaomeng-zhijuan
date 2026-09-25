@@ -205,3 +205,22 @@
     50% { opacity: 0.55; }
   }
 }
+
+/* 编辑页生成区：resolving 时占位层覆盖在流式文字上方同步淡出 */
+.mgen-area { position: relative; }
+.mgen-area .mgen-skel-top {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 候选卡扫光错相位：每卡注入 --skel-delay（0 / 0.18s / 0.36s） */
+.mcs-skeleton .skel-line {
+  animation-delay: var(--skel-delay, 0s);
+}
+/* 兜底：错相 delay 同样应用于呼吸降级 */
+@media (prefers-reduced-motion: reduce) {
+  .mcs-skeleton .skel-line {
+    animation-delay: var(--skel-delay, 0s);
+  }
+}

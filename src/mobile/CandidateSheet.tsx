@@ -137,10 +137,10 @@ export function CandidateSheet() {
           <div className="mcs-carousel" ref={carouselRef}>
             {generating &&
               [0, 1, 2].map((i) => (
-                <div className="mcs-skeleton" key={i}>
-                  <div className="sk-line" />
-                  <div className="sk-line" />
-                  <div className="sk-line short" />
+                <div className="mcs-skeleton" key={i} style={{ '--skel-delay': `${(i * 0.18).toFixed(2)}s` } as React.CSSProperties}>
+                  <div className="skel-line" style={{ width: i % 2 ? '88%' : '96%' }} />
+                  <div className="skel-line" />
+                  <div className="skel-line" style={{ width: '72%' }} />
                 </div>
               ))}
             {!generating &&

@@ -102,14 +102,18 @@ pub fn run() {
         kind: MigrationKind::Up,
     }];
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_http::init())
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations("sqlite:xiaomeng.db", migrations)
                 .build(),
         )
-        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_dialog::init());
+    // 触感反馈仅移动端注册（桌面无意义，冻结平台保持零行为变化）
+    #[cfg(mobile)]
+    let builder = builder.plugin(tauri_plugin_haptics::init());
+    builder
         .invoke_handler(tauri::generate_handler![
             dpapi_protect,
             dpapi_reveal,

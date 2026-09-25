@@ -1,0 +1,117 @@
+/*
+ * DCR 设计语言 v2 令牌（docs/design-language.md §3）。
+ * 作用域限定 .mshell：桌面壳（已冻结）不受影响。
+ * 桥接层：旧令牌名（--accent/--text/--sub/--border/--bg/--card）指向新令牌，
+ * 使既有 mobile.css 在不改动的前提下继承新色板。
+ */
+
+.mshell {
+  /* 品牌三阶 */
+  --brand: #f0655a;
+  --brand-strong: #e04b40;
+  --brand-soft: #f8796f;
+  --brand-tint: #fef0ef;
+
+  /* 中性灰 7 级 */
+  --gray-0: #ffffff;
+  --gray-1: #fafafa;
+  --gray-2: #e8e8e8;
+  --gray-3: #9a9a9a;
+  --gray-4: #5a5a5a;
+  --gray-5: #303133;
+  --gray-6: #1e1e1e;
+  --gray-7: #000000;
+
+  /* 语义色（三阶） */
+  --danger: #e5484d;
+  --danger-strong: #c73338;
+  --danger-tint: #fdecec;
+  --success: #2f9e6e;
+  --success-strong: #237a54;
+  --success-tint: #e6f6ef;
+  --warning: #e7922a;
+  --warning-strong: #c16e21;
+  --warning-tint: #fff3e4;
+
+  /* 玻璃拟态与遮罩 */
+  --glass-bg: color-mix(in srgb, var(--gray-0) 82%, transparent);
+  --glass-blur: 0.4rem;
+  --scrim: rgba(0, 0, 0, 0.45);
+
+  /* 字阶（每级配对行高见 design-language.md §3.2） */
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-body: 17px;
+  --fs-lg: 20px;
+  --fs-xl: 24px;
+  --fs-2xl: 28px;
+
+  /* 间距 4px 基距 */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  /* 阴影（环境光式，无方向） */
+  --shadow-1: 0 0 8px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 0 16px rgba(0, 0, 0, 0.12);
+  --shadow-3: 0 0 24px rgba(0, 0, 0, 0.16);
+  --shadow-float: 0 4px 16px rgba(240, 101, 90, 0.35);
+
+  /* 动效时长与缓动 */
+  --dur-fast: 100ms;
+  --dur-base: 200ms;
+  --dur-slow: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-stiffness: 380;
+  --spring-damping: 26;
+
+  /* ── 桥接层：旧名 → 新令牌（mobile.css 既有规则零改动即生效） ── */
+  --accent: var(--brand);
+  --accent-hover: var(--brand-strong);
+  --accent-soft: var(--brand-tint);
+  --accent-text: var(--brand-strong);
+  --text: var(--gray-5);
+  --sub: var(--gray-3);
+  --border: var(--gray-2);
+  --bg: var(--gray-0);
+  --card: var(--gray-0);
+  --menu: var(--gray-4);
+  --skeleton: var(--gray-2);
+  --cursor-line: var(--brand);
+}
+
+.dark .mshell {
+  --gray-0: #1a1b1e;
+  --gray-1: #232428;
+  --gray-2: #36383d;
+  --gray-3: #9a9a9a;
+  --gray-4: #b8b8b8;
+  --gray-5: #e8e8e8;
+  --gray-6: #f2f2f2;
+  --gray-7: #ffffff;
+  --glass-bg: color-mix(in srgb, var(--gray-1) 82%, transparent);
+  --scrim: rgba(0, 0, 0, 0.6);
+}
+
+/* 减少动画：时长归零（design-language.md §3.4） */
+@media (prefers-reduced-motion: reduce) {
+  .mshell {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}

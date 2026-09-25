@@ -8,6 +8,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { timeline } from '../worldtree/tree';
 import { useGenerate } from '../editor/useGenerate';
+import { Button } from './components/Button';
+import { haptic } from './components/useHaptics';
 import { mobileCopy } from './copy';
 
 function formatTime(ms: number): string {
@@ -79,6 +81,7 @@ export function MobileEditor() {
       cancel();
       return;
     }
+    void haptic('light');
     void run();
   }
 
@@ -131,29 +134,29 @@ export function MobileEditor() {
               </span>
               <span className="mred-line" />
               <div className="mred-toolbar">
-                <button
-                  onClick={() => {
-                    revertRed();
-                  }}
-                >
+                <Button variant="ghost" size="sm" onClick={() => revertRed()}>
                   ↩ 撤回
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setEditValue(redNode.text);
                     setEditing(true);
                   }}
                 >
                   ✎ 修改
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => {
                     keepRed();
                     void run();
                   }}
                 >
                   ✓ 继续
-                </button>
+                </Button>
               </div>
             </>
           )}
@@ -169,15 +172,19 @@ export function MobileEditor() {
                 autoFocus
               />
               <div className="mred-toolbar">
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => {
                     confirmEditedText(editValue);
                     setEditing(false);
                   }}
                 >
                   ✓ 确认
-                </button>
-                <button onClick={() => setEditing(false)}>✕ 取消</button>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
+                  ✕ 取消
+                </Button>
               </div>
             </>
           )}
@@ -189,13 +196,9 @@ export function MobileEditor() {
         <div style={{ margin: '10px 0', padding: '12px 14px', background: 'var(--accent-soft)', borderRadius: 12, fontSize: 14, lineHeight: 1.8, color: 'var(--accent-text)' }}>
           ⚠ 生成失败：{gen.errorMessage}
           <div style={{ marginTop: 8 }}>
-            <button
-              className="hit-44"
-              onClick={() => void run()}
-              style={{ height: 36, padding: '0 16px', border: 'none', borderRadius: 18, background: 'var(--accent)', color: '#fff', fontSize: 14 }}
-            >
-              重试
-            </button>
+            <Button variant="primary" size="sm" onClick={() => void run()}>
+              重试续写
+            </Button>
           </div>
         </div>
       )}

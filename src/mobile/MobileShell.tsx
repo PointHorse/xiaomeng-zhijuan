@@ -11,6 +11,7 @@ import { BookshelfPage } from './BookshelfPage';
 import { WorldTreeView } from '../worldtree/WorldTreeView';
 import { DashboardView } from '../dashboard/DashboardView';
 import { SettingsView } from '../settings/SettingsView';
+import './tokens.css';
 import './mobile.css';
 
 export type MobilePage = 'editor' | 'shelf' | 'worldtree' | 'dashboard' | 'settings';

@@ -16,6 +16,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 tauri-plugin-dialog = "2"
+tauri-plugin-haptics = "2"
 # unsafe-headers：允许 JS 侧传空 Origin 头，插件会在 Rust 侧移除该头。
 # 部分模型中转站对带陌生 Origin 的 POST 一律按 CSRF 拒绝（403 CSRF_INVALID），
 # 必须能去掉 tauri.localhost 来源才能用（见 src/provider/openai.ts）。

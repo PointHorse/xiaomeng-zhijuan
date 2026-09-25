@@ -19,6 +19,7 @@ import { buildTxtExport } from '../export/exporters';
 import { writeExportFile } from '../store/persist';
 import { showToast } from '../components/toast';
 import { SheetPortal } from './SheetPortal';
+import { Button } from './components/Button';
 import { mobileCopy } from './copy';
 
 interface Props {
@@ -232,22 +233,25 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
       {/* 多选模式底部操作条 */}
       {multi && (
         <div className="mshelf-actions">
-          <button
-            className="danger"
+          <Button
+            variant="danger"
             disabled={checked.size === 0}
+            disabledReason={checked.size === 0 ? '请先勾选要删除的故事' : undefined}
             onClick={() => setConfirmDelete(true)}
           >
             🗑 删除
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
             disabled={checked.size === 0}
+            disabledReason={checked.size === 0 ? '请先勾选故事' : undefined}
             onClick={() => {
               const first = stories.find((s) => checked.has(s.id));
               setMovingTarget(first ?? null);
             }}
           >
             📁 {mobileCopy.moveToFolder}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -338,9 +342,9 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
                 autoFocus
               />
             </div>
-            <button className="mprimary-btn" onClick={() => void doRename()}>
+            <Button variant="primary" onClick={() => void doRename()}>
               {mobileCopy.done}
-            </button>
+            </Button>
           </>
         )}
       </SheetPortal>
@@ -350,16 +354,15 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
         <p style={{ margin: '8px 0 14px', fontSize: 15, lineHeight: 1.8, color: 'var(--text)' }}>
           {mobileCopy.deleteConfirm.replace('{n}', String(checked.size))}
         </p>
-        <button
-          className="mprimary-btn"
-          style={{ background: 'var(--accent)' }}
+        <Button
+          variant="danger"
           onClick={() => {
             setConfirmDelete(false);
             void doDelete();
           }}
         >
-          {mobileCopy.delete}
-        </button>
+          确认删除
+        </Button>
       </SheetPortal>
 
       {/* 移入文件夹 Sheet */}
@@ -398,9 +401,10 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
             onChange={(e) => setFolderName(e.target.value)}
           />
         </div>
-        <button
-          className="mprimary-btn"
+        <Button
+          variant="primary"
           disabled={!folderName.trim()}
+          disabledReason={!folderName.trim() ? '请先输入文件夹名称' : undefined}
           onClick={() => {
             const name = folderName.trim();
             const ids = multi ? [...checked] : movingTarget ? [movingTarget.id] : [];
@@ -415,7 +419,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
           }}
         >
           ＋ {mobileCopy.newFolder}
-        </button>
+        </Button>
       </SheetPortal>
 
       {/* 模型设置 Sheet（每书覆盖，与桌面 storyOverride 一致） */}
@@ -459,9 +463,9 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
                 onChange={(e) => setModelDialog({ ...modelDialog, temperature: e.target.value })}
               />
             </div>
-            <button className="mprimary-btn" onClick={() => void saveModelDialog()}>
+            <Button variant="primary" onClick={() => void saveModelDialog()}>
               {mobileCopy.done}
-            </button>
+            </Button>
           </>
         )}
       </SheetPortal>

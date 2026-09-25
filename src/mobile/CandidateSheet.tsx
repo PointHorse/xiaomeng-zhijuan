@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { useGenerate } from '../editor/useGenerate';
+import { Button } from './components/Button';
 import { mobileCopy } from './copy';
 
 type Snap = 'closed' | 'collapsed' | 'open' | 'expanded';
@@ -123,9 +124,9 @@ export function CandidateSheet() {
       >
         <div className="msheet-handle" style={{ margin: '0 8px 0 0' }} />
         <div className="mcs-title">🤖 {mobileCopy.candidateTitle}</div>
-        <button className="pill-refresh hit-44" disabled={generating} onClick={() => void run()}>
+        <Button variant="secondary" size="sm" disabled={generating} onClick={() => void run()}>
           ⟳ 换一批
-        </button>
+        </Button>
         <button className="mcs-close" aria-label="关闭" onClick={() => setSnap('closed')}>
           ✕
         </button>

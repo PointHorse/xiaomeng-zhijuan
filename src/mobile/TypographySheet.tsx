@@ -3,7 +3,7 @@
  * 与桌面 TopBar 排版 popover 同参数集：字号 / 行距 / 字体，实时生效。
  */
 import { useStore } from '../store/useStore';
-import { SheetPortal } from './SheetPortal';
+import { BottomSheet } from './components/BottomSheet';
 import { applyTypography } from '../settings/theme';
 
 const FONTS: Array<{ label: string; value: string }> = [
@@ -24,7 +24,7 @@ export function TypographySheet({ open, onClose }: { open: boolean; onClose: () 
   }
 
   return (
-    <SheetPortal open={open} onClose={onClose} title="字号与排版">
+    <BottomSheet open={open} onClose={onClose} title="字号与排版">
       <div className="mfield">
         <label>字号 · {settings.fontSize}px</label>
         <input
@@ -63,6 +63,6 @@ export function TypographySheet({ open, onClose }: { open: boolean; onClose: () 
       <button className="mprimary-btn" onClick={onClose}>
         完成
       </button>
-    </SheetPortal>
+    </BottomSheet>
   );
 }

@@ -18,7 +18,7 @@ import {
 import { buildTxtExport } from '../export/exporters';
 import { writeExportFile } from '../store/persist';
 import { showToast } from '../components/toast';
-import { SheetPortal } from './SheetPortal';
+import { BottomSheet, SheetRow, SheetSep } from './components/BottomSheet';
 import { Button } from './components/Button';
 import { mobileCopy } from './copy';
 
@@ -256,39 +256,39 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
       )}
 
       {/* 单条操作 Sheet（§5：重命名、删除、模型设置、导出） */}
-      <SheetPortal open={actionTarget !== null} onClose={() => setActionTarget(null)} title={actionTarget?.title}>
+      <BottomSheet open={actionTarget !== null} onClose={() => setActionTarget(null)} title={actionTarget?.title}>
         {actionTarget && (
           <>
-            <button
-              className="msheet-row"
+            <SheetRow
+              icon="✎"
               onClick={() => {
                 setRenaming({ id: actionTarget.id, value: actionTarget.title });
                 setActionTarget(null);
               }}
             >
-              ✎ {mobileCopy.rename}
-            </button>
-            <button
-              className="msheet-row"
+              {mobileCopy.rename}
+            </SheetRow>
+            <SheetRow
+              icon="☑"
               onClick={() => {
                 setMulti(true);
                 setChecked(new Set([actionTarget.id]));
                 setActionTarget(null);
               }}
             >
-              ☑ {mobileCopy.multiSelect}
-            </button>
-            <button
-              className="msheet-row"
+              {mobileCopy.multiSelect}
+            </SheetRow>
+            <SheetRow
+              icon="⬇"
               onClick={() => {
                 void doExport(actionTarget);
                 setActionTarget(null);
               }}
             >
-              ⬇ {mobileCopy.export} TXT
-            </button>
-            <button
-              className="msheet-row"
+              {mobileCopy.export} TXT
+            </SheetRow>
+            <SheetRow
+              icon="⚡"
               onClick={() => {
                 void import('../shelf/storyOverride').then(async (m) => {
                   const ov = await m.loadOverride(actionTarget.id);
@@ -304,34 +304,34 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
                 setActionTarget(null);
               }}
             >
-              ⚡ {mobileCopy.modelSettings}
-            </button>
-            <div className="msheet-sep" />
-            <button
-              className="msheet-row"
+              {mobileCopy.modelSettings}
+            </SheetRow>
+            <SheetSep />
+            <SheetRow
+              icon="📁"
               onClick={() => {
                 setMovingTarget(actionTarget);
                 setActionTarget(null);
               }}
             >
-              📁 {mobileCopy.moveToFolder}
-            </button>
-            <button
-              className="msheet-row danger"
+              {mobileCopy.moveToFolder}
+            </SheetRow>
+            <SheetRow
+              icon="🗑"
               onClick={() => {
                 setChecked(new Set([actionTarget.id]));
                 setActionTarget(null);
                 setMulti(true);
               }}
             >
-              🗑 {mobileCopy.delete}
-            </button>
+              {mobileCopy.delete}
+            </SheetRow>
           </>
         )}
-      </SheetPortal>
+      </BottomSheet>
 
       {/* 重命名 Sheet */}
-      <SheetPortal open={renaming !== null} onClose={() => setRenaming(null)} title={mobileCopy.renamePromptTitle}>
+      <BottomSheet open={renaming !== null} onClose={() => setRenaming(null)} title={mobileCopy.renamePromptTitle}>
         {renaming && (
           <>
             <div className="mfield">
@@ -347,10 +347,10 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
             </Button>
           </>
         )}
-      </SheetPortal>
+      </BottomSheet>
 
       {/* 删除确认 Sheet（§5 删除需二次确认） */}
-      <SheetPortal open={confirmDelete} onClose={() => setConfirmDelete(false)} title={mobileCopy.delete}>
+      <BottomSheet open={confirmDelete} onClose={() => setConfirmDelete(false)} title={mobileCopy.delete}>
         <p style={{ margin: '8px 0 14px', fontSize: 15, lineHeight: 1.8, color: 'var(--text)' }}>
           {mobileCopy.deleteConfirm.replace('{n}', String(checked.size))}
         </p>
@@ -363,12 +363,12 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
         >
           确认删除
         </Button>
-      </SheetPortal>
+      </BottomSheet>
 
       {/* 移入文件夹 Sheet */}
-      <SheetPortal open={movingTarget !== null} onClose={() => setMovingTarget(null)} title={mobileCopy.moveToFolder}>
-        <button
-          className="msheet-row"
+      <BottomSheet open={movingTarget !== null} onClose={() => setMovingTarget(null)} title={mobileCopy.moveToFolder}>
+        <SheetRow
+          icon="📄"
           onClick={() => {
             if (movingTarget) {
               const ids = multi ? [...checked] : [movingTarget.id];
@@ -377,22 +377,22 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
             setMovingTarget(null);
           }}
         >
-          📄 {mobileCopy.noFolder}
-        </button>
+          {mobileCopy.noFolder}
+        </SheetRow>
         {folders.map((f) => (
-          <button
+          <SheetRow
             key={f.id}
-            className="msheet-row"
+            icon="📁"
             onClick={() => {
               const ids = multi ? [...checked] : movingTarget ? [movingTarget.id] : [];
               void Promise.all(ids.map((id) => setStoryFolder(id, f.id))).then(() => refresh());
               setMovingTarget(null);
             }}
           >
-            📁 {f.name}
-          </button>
+            {f.name}
+          </SheetRow>
         ))}
-        <div className="msheet-sep" />
+        <SheetSep />
         <div className="mfield">
           <input
             type="text"
@@ -420,10 +420,10 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
         >
           ＋ {mobileCopy.newFolder}
         </Button>
-      </SheetPortal>
+      </BottomSheet>
 
       {/* 模型设置 Sheet（每书覆盖，与桌面 storyOverride 一致） */}
-      <SheetPortal open={modelDialog !== null} onClose={() => setModelDialog(null)} title={`${mobileCopy.modelSettings} · ${modelDialog?.title ?? ''}`}>
+      <BottomSheet open={modelDialog !== null} onClose={() => setModelDialog(null)} title={`${mobileCopy.modelSettings} · ${modelDialog?.title ?? ''}`}>
         {modelDialog && (
           <>
             <div className="mfield">
@@ -468,7 +468,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
             </Button>
           </>
         )}
-      </SheetPortal>
+      </BottomSheet>
     </>
   );
 }

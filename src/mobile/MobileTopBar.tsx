@@ -1,10 +1,11 @@
 /**
  * 移动端顶栏（§2，单行 56dp）：
  * ＋新建 → 书架 → 居中应用名/风格名 → 珊瑚红胶囊(模型/风格 ▾) → ··· 更多菜单
+ * 弹出面板统一 BottomSheet（阶段 1-B）：弹性升降/下拉关闭/选中勾选。
  */
 import { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { SheetPortal } from './SheetPortal';
+import { BottomSheet, SheetRow, SheetSep } from './components/BottomSheet';
 import { TypographySheet } from './TypographySheet';
 import type { MobilePage } from './MobileShell';
 import { showToast } from '../components/toast';
@@ -34,7 +35,7 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
         📚
       </button>
       <div className="mtopbar-center">{activeStyle ? activeStyle.name : 'DreamCore'}</div>
-      <button className="mtopbar-capsule hit-44" onClick={() => setModelOpen(true)}>
+      <button className="mtopbar-capsule hit-44" aria-label="模型与风格选择" onClick={() => setModelOpen(true)}>
         <span className="cap-label">⚡ {settings.model || 'mock'}</span>
         <span className="cap-caret">▾</span>
       </button>
@@ -43,39 +44,54 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
       </button>
 
       {/* 模型/风格选择 Sheet（§2） */}
-      <SheetPortal open={modelOpen} onClose={() => setModelOpen(false)} title="模型与风格">
-        <button className="msheet-row" onClick={() => { setModelOpen(false); onOpenPage('settings'); }}>
-          ⚡ 当前模型：{settings.model || 'mock'}（轻点修改）
-        </button>
-        <div className="msheet-sep" />
+      <BottomSheet open={modelOpen} onClose={() => setModelOpen(false)} title="模型与风格">
+        <SheetRow
+          icon="⚡"
+          sub="轻点修改地址、Key 与模型名"
+          onClick={() => {
+            setModelOpen(false);
+            onOpenPage('settings');
+          }}
+        >
+          当前模型：{settings.model || 'mock'}
+        </SheetRow>
+        <SheetSep />
         {styles.length === 0 && (
-          <button className="msheet-row" onClick={() => { setModelOpen(false); onOpenPage('settings'); }}>
-            ◐ 风格：默认（在设置中添加风格）
-          </button>
+          <SheetRow
+            icon="◐"
+            sub="在设置中添加风格"
+            onClick={() => {
+              setModelOpen(false);
+              onOpenPage('settings');
+            }}
+          >
+            风格：默认
+          </SheetRow>
         )}
         {styles.map((s) => (
-          <button
+          <SheetRow
             key={s.id}
-            className="msheet-row"
+            icon="◐"
+            selected={s.id === activeStyleId}
             onClick={() => {
               setSettings({ activeStyleId: s.id } as never);
               setModelOpen(false);
             }}
           >
-            ◐ {s.name} {s.id === activeStyleId ? '✓' : ''}
-          </button>
+            {s.name}
+          </SheetRow>
         ))}
-      </SheetPortal>
+      </BottomSheet>
 
-      {/* 更多菜单 Sheet（§2）：保存、字号与排版、明暗主题、平行世界树、仪表盘、模型设置、导出长图、设置 */}
-      <SheetPortal open={moreOpen} onClose={() => setMoreOpen(false)} title="更多">
+      {/* 更多菜单 Sheet（§2） */}
+      <BottomSheet open={moreOpen} onClose={() => setMoreOpen(false)} title="更多">
         <MoreMenu
           onClose={() => setMoreOpen(false)}
           onOpenPage={onOpenPage}
           onModel={() => setModelOpen(true)}
           onTypography={() => setTypoOpen(true)}
         />
-      </SheetPortal>
+      </BottomSheet>
 
       <TypographySheet open={typoOpen} onClose={() => setTypoOpen(false)} />
     </header>
@@ -96,20 +112,27 @@ function MoreMenu({
   const isDark = document.documentElement.classList.contains('dark');
   return (
     <>
-      <button
-        className="msheet-row"
-        onClick={() => { void import('../shelf/saveNow').then((m) => m.saveNowToShelf()); onClose(); }}
+      <SheetRow
+        icon="💾"
+        onClick={() => {
+          void import('../shelf/saveNow').then((m) => m.saveNowToShelf());
+          onClose();
+        }}
       >
-        💾 保存
-      </button>
-      <button
-        className="msheet-row"
-        onClick={() => { onTypography(); onClose(); }}
+        保存
+      </SheetRow>
+      <SheetRow
+        icon="🅰"
+        onClick={() => {
+          onTypography();
+          onClose();
+        }}
       >
-        🅰 字号与排版
-      </button>
-      <button
-        className="msheet-row"
+        字号与排版
+      </SheetRow>
+      <SheetRow
+        icon={isDark ? '☀' : '🌙'}
+        sub={isDark ? '当前深色' : '当前浅色'}
         onClick={() => {
           const next = isDark ? 'light' : 'dark';
           void import('../settings/theme').then((m) => m.applyTheme(next));
@@ -117,20 +140,38 @@ function MoreMenu({
           showToast(isDark ? '已切换为浅色' : '已切换为深色');
         }}
       >
-        {isDark ? '☀ 明暗主题（当前深色）' : '🌙 明暗主题（当前浅色）'}
-      </button>
-      <div className="msheet-sep" />
-      <button className="msheet-row" onClick={() => { onOpenPage('worldtree'); onClose(); }}>
-        🌳 平行世界树
-      </button>
-      <button className="msheet-row" onClick={() => { onOpenPage('dashboard'); onClose(); }}>
-        📊 仪表盘
-      </button>
-      <button className="msheet-row" onClick={() => { onModel(); onClose(); }}>
-        ⚡ 模型设置
-      </button>
-      <button
-        className="msheet-row"
+        明暗主题
+      </SheetRow>
+      <SheetSep />
+      <SheetRow
+        icon="🌳"
+        onClick={() => {
+          onOpenPage('worldtree');
+          onClose();
+        }}
+      >
+        平行世界树
+      </SheetRow>
+      <SheetRow
+        icon="📊"
+        onClick={() => {
+          onOpenPage('dashboard');
+          onClose();
+        }}
+      >
+        仪表盘
+      </SheetRow>
+      <SheetRow
+        icon="⚡"
+        onClick={() => {
+          onModel();
+          onClose();
+        }}
+      >
+        模型设置
+      </SheetRow>
+      <SheetRow
+        icon="🖼"
         onClick={() => {
           void import('../export/shareImage').then(async (m) => {
             const s = useStore.getState();
@@ -144,12 +185,18 @@ function MoreMenu({
           onClose();
         }}
       >
-        🖼 导出长图
-      </button>
-      <div className="msheet-sep" />
-      <button className="msheet-row" onClick={() => { onOpenPage('settings'); onClose(); }}>
-        ⚙ 设置
-      </button>
+        导出长图
+      </SheetRow>
+      <SheetSep />
+      <SheetRow
+        icon="⚙"
+        onClick={() => {
+          onOpenPage('settings');
+          onClose();
+        }}
+      >
+        设置
+      </SheetRow>
     </>
   );
 }

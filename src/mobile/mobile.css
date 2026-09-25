@@ -389,6 +389,16 @@
 /* ---------- 候选抽屉 CandidateSheet（§4） ---------- */
 .mcsheet {
   height: 40%;
+  /* 阶段1-B：玻璃底 + 弹性入场（BottomSheet 同语言） */
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-2);
+  animation: m-sheet-up var(--dur-slow) var(--ease-spring);
+}
+@keyframes m-sheet-up {
+  from { transform: translateY(100%); }
 }
 .mcsheet.expanded {
   height: 75%;

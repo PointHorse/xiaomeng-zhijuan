@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>DCR 设计语言 v2 · 预览</title>
+<style>
+/* ===== 设计令牌（与 docs/design-language.md §3 一致） ===== */
+:root {
+  --brand: #f0655a;
+  --brand-strong: #e04b40;
+  --brand-soft: #f8796f;
+  --brand-tint: #fef0ef;
+
+  --gray-0: #ffffff; --gray-1: #fafafa; --gray-2: #e8e8e8; --gray-3: #9a9a9a;
+  --gray-4: #5a5a5a; --gray-5: #303133; --gray-6: #1e1e1e; --gray-7: #000000;
+
+  --danger: #e5484d; --danger-strong: #c73338; --danger-tint: #fdecec;
+  --success: #2f9e6e; --success-tint: #e6f6ef;
+
+  --glass-bg: color-mix(in srgb, var(--gray-0) 82%, transparent);
+  --glass-blur: 0.4rem;
+  --scrim: rgba(0, 0, 0, 0.45);
+
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 15px; --fs-body: 17px;
+  --fs-lg: 20px; --fs-xl: 24px; --fs-2xl: 28px;
+
+  --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px; --radius-full: 999px;
+
+  --shadow-1: 0 0 8px rgba(0,0,0,0.08);
+  --shadow-2: 0 0 16px rgba(0,0,0,0.12);
+  --shadow-3: 0 0 24px rgba(0,0,0,0.16);
+  --shadow-float: 0 4px 16px rgba(240,101,90,0.35);
+
+  --dur-fast: 100ms; --dur-base: 200ms; --dur-slow: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+html.dark {
+  --gray-0: #1a1b1e; --gray-1: #232428; --gray-2: #36383d;
+  --gray-3: #9a9a9a; --gray-4: #b8b8b8; --gray-5: #e8e8e8;
+  --gray-6: #f2f2f2; --gray-7: #ffffff;
+  --glass-bg: color-mix(in srgb, var(--gray-1) 82%, transparent);
+  --scrim: rgba(0, 0, 0, 0.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; }
+}
+
+* { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--gray-0); color: var(--gray-5);
+  font-family: system-ui, -apple-system, "HarmonyOS Sans SC", "MiSans", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: var(--fs-md); line-height: 1.55;
+  transition: background-color var(--dur-base) var(--ease-standard);
+}
+.demo { max-width: 520px; margin: 0 auto; padding: 0 var(--sp-4) 96px; }
+
+/* ===== 玻璃顶栏（M4 玻璃拟态） ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 14px var(--sp-4);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--gray-2);
+}
+.topbar h1 { font-size: var(--fs-lg); font-weight: 700; flex: 1; }
+.topbar .sub { font-size: var(--fs-xs); color: var(--gray-3); display: block; font-weight: 400; }
+
+section { margin-top: var(--sp-8); }
+h2 { font-size: var(--fs-lg); font-weight: 700; margin-bottom: var(--sp-2); }
+h2 .tag {
+  font-size: var(--fs-xs); font-weight: 400; color: var(--gray-3);
+  display: block; margin-top: 2px;
+}
+.note { font-size: var(--fs-sm); color: var(--gray-3); margin: var(--sp-2) 0 var(--sp-4); }
+
+/* ===== Button ===== */
+.m-btn {
+  min-height: 44px; padding: 0 var(--sp-4);
+  border-radius: var(--radius-sm); border: none; cursor: pointer;
+  font: inherit; font-size: var(--fs-md); font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background-color var(--dur-fast) var(--ease-standard),
+              transform var(--dur-fast) var(--ease-standard),
+              opacity var(--dur-fast) var(--ease-standard);
+}
+.m-btn:active { transform: scale(0.97); }
+.m-btn:focus-visible { outline: 3px solid var(--brand-soft); outline-offset: 2px; }
+.m-btn--primary { background: var(--brand); color: #fff; box-shadow: var(--shadow-float); }
+.m-btn--primary:active { background: var(--brand-strong); }
+.m-btn--secondary {
+  background: var(--gray-1); color: var(--gray-5);
+  border: 1px solid var(--gray-2); box-shadow: var(--shadow-1);
+}
+.m-btn--secondary:active { background: var(--gray-2); }
+.m-btn--danger { background: var(--danger); color: #fff; }
+.m-btn--danger:active { background: var(--danger-strong); }
+.m-btn--ghost { background: transparent; color: var(--gray-4); }
+.m-btn--ghost:active { background: var(--gray-2); }
+.m-btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+.m-btn .spin {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+.m-btn--secondary .spin { border-color: var(--gray-2); border-top-color: var(--gray-4); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.btn-reason {
+  font-size: var(--fs-sm); color: var(--gray-3); margin: -4px 0 var(--sp-4);
+  padding-left: 2px;
+}
+.btn-result { font-size: var(--fs-sm); font-weight: 700; color: var(--success); margin-left: 2px; opacity: 0; transition: opacity var(--dur-base) var(--ease-standard); }
+.btn-result.show { opacity: 1; }
+.danger-note { font-size: var(--fs-sm); color: var(--danger); background: var(--danger-tint); border-radius: var(--radius-sm); padding: 8px 12px; margin-top: var(--sp-3); opacity: 0; transition: opacity var(--dur-base); }
+.danger-note.show { opacity: 1; }
+
+/* ===== Bottom Sheet ===== */
+.mask {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--scrim);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+.mask.open { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 101;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-3);
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+.sheet.open { transform: translateY(0); }
+.sheet.dragging { transition: none; }
+.grip { padding: 10px 16px 4px; touch-action: none; cursor: grab; }
+.grip .handle { width: 40px; height: 4px; border-radius: 2px; background: var(--gray-2); margin: 0 auto; }
+.sheet-title { text-align: center; font-weight: 700; padding: 6px 0 10px; }
+.rows { padding: 0 var(--sp-4) var(--sp-4); }
+.row {
+  display: flex; align-items: center; gap: var(--sp-3); width: 100%;
+  min-height: 48px; padding: 0 var(--sp-3);
+  border: none; background: transparent; border-radius: var(--radius-sm);
+  font: inherit; font-size: var(--fs-md); color: var(--gray-5);
+  cursor: pointer; text-align: left;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.row:active { background: var(--gray-2); }
+.row[aria-selected="true"] {
+  color: var(--brand); background: var(--brand-tint); font-weight: 700;
+}
+.row .check { margin-left: auto; opacity: 0; transition: opacity var(--dur-fast); color: var(--brand); font-weight: 700; }
+.row[aria-selected="true"] .check { opacity: 1; }
+
+/* ===== 生成中加载（模糊占位 + 扫光） ===== */
+.mock-editor {
+  background: var(--gray-1); border: 1px solid var(--gray-2);
+  border-radius: var(--radius-md); padding: var(--sp-4);
+}
+.mock-body { font-size: var(--fs-body); line-height: 1.8; margin-bottom: var(--sp-4); }
+.mock-body .old { color: var(--gray-5); }
+.mock-body .red { color: var(--brand); }
+.skel-wrap { position: relative; }
+.skel-line {
+  height: 1em; border-radius: var(--radius-full); margin: 10px 0;
+  background: color-mix(in srgb, var(--brand-tint) 70%, var(--brand) 8%);
+  filter: blur(4px);
+  background-image: linear-gradient(100deg, transparent 32%, rgba(255,255,255,0.75) 50%, transparent 68%);
+  background-size: 220% 100%;
+  animation: skel-sweep 1.4s linear infinite;
+}
+.skel-wrap .skel-line:nth-child(2) { animation-delay: 0.18s; }
+.skel-wrap .skel-line:nth-child(3) { animation-delay: 0.36s; width: 72%; }
+.skel-wrap .skel-line:nth-child(4) { animation-delay: 0.3s; width: 55%; }
+@keyframes skel-sweep { from { background-position: 130% 0; } to { background-position: -90% 0; } }
+.skel-wrap.is-resolving .skel-line { animation: skel-resolve 300ms var(--ease-standard) forwards; }
+@keyframes skel-resolve { to { filter: blur(0); opacity: 0; } }
+.real-text {
+  position: absolute; inset: 0; color: var(--brand);
+  line-height: 1.8; opacity: 0;
+  transition: opacity 280ms var(--ease-standard) 120ms;
+}
+.skel-wrap.is-resolving + .real-text, .mock-body.show-real .real-text { opacity: 1; }
+.cards { display: grid; gap: var(--sp-3); margin-top: var(--sp-4); }
+.card {
+  border: 1px solid var(--gray-2); border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4); background: var(--gray-0);
+  position: relative;
+}
+.card.adopted { background: var(--brand-tint); border-color: var(--brand); }
+.card.adopted::before {
+  content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
+  width: 3px; border-radius: 2px; background: var(--brand);
+}
+.card .c-text { font-size: var(--fs-md); line-height: 1.7; color: var(--gray-5); display: none; }
+.card.resolved .skel-wrap { display: none; }
+.card.resolved .c-text { display: block; }
+.card { transition: background-color var(--dur-base) var(--ease-standard), border-color var(--dur-base) var(--ease-standard); }
+
+@media (prefers-reduced-motion: reduce) {
+  .skel-line { filter: blur(2px); animation: skel-breath 2.4s ease-in-out infinite; }
+  @keyframes skel-breath { 50% { opacity: 0.55; } }
+}
+.ai-ball {
+  position: fixed; right: 14px; bottom: 28px; z-index: 90;
+  width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--brand); color: #fff; font-size: 20px;
+  box-shadow: var(--shadow-float);
+  transition: transform var(--dur-fast) var(--ease-spring), background-color var(--dur-fast);
+}
+.ai-ball:active { transform: scale(0.92); background: var(--brand-strong); }
+footer { margin-top: var(--sp-8); font-size: var(--fs-xs); color: var(--gray-3); line-height: 1.8; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <h1>DCR 设计语言 v2<span class="sub">Peroxide × 珊瑚红 · 静态预览</span></h1>
+  <button class="m-btn m-btn--ghost" id="themeBtn" aria-label="切换明暗主题">🌙</button>
+</header>
+
+<main class="demo">
+  <!-- ============ Button ============ -->
+  <section>
+    <h2>1 · 按钮<span class="tag">primary 每屏至多一个 · 按压 scale(0.97)+色加深 100ms · 禁用必须说明原因</span></h2>
+    <div class="btn-row">
+      <button class="m-btn m-btn--primary" id="saveBtn">保存更改</button>
+      <span class="btn-result" id="saveResult">✓ 已保存</span>
+    </div>
+    <div class="btn-row">
+      <button class="m-btn m-btn--secondary">打开书架</button>
+      <button class="m-btn m-btn--ghost">预览长图</button>
+      <button class="m-btn m-btn--danger" id="delBtn">删除故事</button>
+    </div>
+    <div class="danger-note" id="delNote">已进入确认流程：删除需要二次确认（阶段 1 用确认弹层实现）</div>
+    <div class="btn-row" style="margin-top: var(--sp-4)">
+      <button class="m-btn m-btn--primary" disabled>开始续写</button>
+    </div>
+    <p class="btn-reason">↑ 禁用原因：请先在设置中填写模型地址（禁用态不能只是变灰）</p>
+    <p class="note">处理中状态：点上方「保存更改」体验 → 按钮进入 spinner 阻止重复提交 → 完成后按钮旁显示「✓ 已保存」。</p>
+  </section>
+
+  <!-- ============ Bottom Sheet ============ -->
+  <section>
+    <h2>2 · 底部弹层<span class="tag">升起 400ms 弹性 · 下拉关闭 · 选项按压反馈 · 选中项品牌色 + 勾</span></h2>
+    <div class="btn-row">
+      <button class="m-btn m-btn--secondary" id="openSheet">选择风格</button>
+    </div>
+    <p class="note">拖住顶部横条向下拉可关闭（≥90px 触发）；轻点选项有按压背景；选中项带品牌色与勾。</p>
+  </section>
+
+  <!-- ============ 加载动画 ============ -->
+  <section>
+    <h2>3 · 生成中加载<span class="tag">模糊占位 + 高光扫光（错相位）· 出字后渐清晰 · 减少动画时呼吸降级</span></h2>
+    <div class="mock-editor">
+      <div class="mock-body">
+        <span class="old">夜深了，城市的霓虹灯</span><span class="red real-wrap" id="redWrap"></span>
+      </div>
+      <div class="skel-wrap" id="bodySkel">
+        <div class="skel-line" style="width:92%"></div>
+        <div class="skel-line"></div>
+        <div class="skel-line"></div>
+      </div>
+      <div class="cards">
+        <div class="card" id="card0">
+          <div class="skel-wrap"><div class="skel-line" style="width:88%"></div><div class="skel-line"></div><div class="skel-line"></div></div>
+          <div class="c-text">夜深了，城市的霓虹灯依然固执地亮着，红的、蓝的、紫的光晕在湿漉漉的路面上晕染开来，像一幅被打翻的调色盘。</div>
+        </div>
+        <div class="card" id="card1">
+          <div class="skel-wrap"><div class="skel-line" style="width:80%"></div><div class="skel-line"></div><div class="skel-line"></div></div>
+          <div class="c-text">夜深了，城市的霓虹灯依旧不知疲倦地闪烁着，把湿漉漉的街道染成一片斑斓。晚归的人裹紧外套，掠过关了一半的卷帘门。</div>
+        </div>
+        <div class="card" id="card2">
+          <div class="skel-wrap"><div class="skel-line" style="width:84%"></div><div class="skel-line"></div><div class="skel-line"></div></div>
+          <div class="c-text">夜深了，城市的霓虹灯在雨后的柏油路面上投下斑斓的倒影。便利店的灯还亮着，暖黄色的光淌在台阶上。</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top: var(--sp-4)">
+      <button class="m-btn m-btn--primary" id="simBtn">模拟流式出字</button>
+      <button class="m-btn m-btn--ghost" id="resetBtn">重置</button>
+    </div>
+    <p class="note">占位行是品牌浅粉的模糊字形 + 左→右扫光高光（三卡错相 0.18s）；点「模拟流式出字」后占位层 blur→0 淡出、真实红字渐显——无生硬切换。系统开启「减少动画」时自动降级为呼吸效果。</p>
+  </section>
+
+  <footer>
+    令牌细节见 docs/design-language.md · 动效原则：弹性只用于浮层召唤（≤400ms），循环动画用线性 + 错相位，仅动 transform/opacity/background-position。
+  </footer>
+</main>
+
+<!-- ============ Sheet 实例 ============ -->
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="选择风格">
+  <div class="grip" id="grip"><div class="handle"></div></div>
+  <div class="sheet-title">选择风格</div>
+  <div class="rows">
+    <button class="row" aria-selected="false">◐ 默认<span class="check">✓</span></button>
+    <button class="row" aria-selected="true">◐ 脑洞大开<span class="check">✓</span></button>
+    <button class="row" aria-selected="false">◐ 简练克制<span class="check">✓</span></button>
+  </div>
+</div>
+
+<button class="ai-ball" aria-label="AI 续写">✒</button>
+
+<script>
+// 明暗切换
+document.getElementById('themeBtn').addEventListener('click', function () {
+  document.documentElement.classList.toggle('dark');
+  this.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+});
+
+// 按钮：处理中 → 成功反馈
+var saveBtn = document.getElementById('saveBtn');
+saveBtn.addEventListener('click', function () {
+  if (saveBtn.dataset.busy) return;
+  saveBtn.dataset.busy = '1';
+  var old = saveBtn.textContent;
+  saveBtn.innerHTML = '<span class="spin"></span>保存中…';
+  document.getElementById('saveResult').classList.remove('show');
+  setTimeout(function () {
+    saveBtn.textContent = old;
+    delete saveBtn.dataset.busy;
+    var r = document.getElementById('saveResult');
+    r.classList.add('show');
+    setTimeout(function () { r.classList.remove('show'); }, 1600);
+  }, 1200);
+});
+
+// danger 二次确认提示
+document.getElementById('delBtn').addEventListener('click', function () {
+  var n = document.getElementById('delNote');
+  n.classList.add('show');
+  setTimeout(function () { n.classList.remove('show'); }, 2400);
+});
+
+// Bottom Sheet 开关 + 下拉关闭
+var mask = document.getElementById('mask'), sheet = document.getElementById('sheet');
+function openSheet() { mask.classList.add('open'); sheet.classList.add('open'); }
+function closeSheet() {
+  sheet.classList.remove('open'); mask.classList.remove('open');
+  sheet.style.transform = '';
+}
+document.getElementById('openSheet').addEventListener('click', openSheet);
+mask.addEventListener('click', closeSheet);
+sheet.querySelectorAll('.row').forEach(function (row) {
+  row.addEventListener('click', function () {
+    sheet.querySelectorAll('.row').forEach(function (r) { r.setAttribute('aria-selected', 'false'); });
+    row.setAttribute('aria-selected', 'true');
+    setTimeout(closeSheet, 180);
+  });
+});
+(function () {
+  var grip = document.getElementById('grip');
+  var startY = null, dy = 0;
+  grip.addEventListener('pointerdown', function (e) {
+    startY = e.clientY; sheet.classList.add('dragging');
+    grip.setPointerCapture(e.pointerId);
+  });
+  grip.addEventListener('pointermove', function (e) {
+    if (startY === null) return;
+    dy = Math.max(0, e.clientY - startY);
+    sheet.style.transform = 'translateY(' + dy + 'px)';
+  });
+  grip.addEventListener('pointerup', function () {
+    if (startY === null) return;
+    sheet.classList.remove('dragging');
+    if (dy > 90) closeSheet(); else sheet.style.transform = '';
+    startY = null; dy = 0;
+  });
+})();
+
+// 加载动画模拟：占位 resolve → 真字渐显；卡片错相 150ms
+var simBtn = document.getElementById('simBtn');
+function resetDemo() {
+  ['bodySkel'].forEach(function (id) { document.getElementById(id).classList.remove('is-resolving'); });
+  [0, 1, 2].forEach(function (i) {
+    var c = document.getElementById('card' + i);
+    c.classList.remove('resolved', 'adopted');
+  });
+}
+document.getElementById('resetBtn').addEventListener('click', resetDemo);
+simBtn.addEventListener('click', function () {
+  resetDemo();
+  var redWrap = document.getElementById('redWrap');
+  redWrap.textContent = '';
+  document.getElementById('bodySkel').classList.add('is-resolving');
+  var full = '依然闪烁着，像不知疲倦的眼睛。晚风掠过高架桥，把白天的余热一点点带走。';
+  var i = 0;
+  var timer = setInterval(function () {
+    i += 1 + Math.floor(Math.random() * 2);
+    redWrap.textContent = full.slice(0, i);
+    if (i >= full.length) {
+      clearInterval(timer);
+      document.getElementById('card0').classList.add('resolved', 'adopted');
+      setTimeout(function () { document.getElementById('card1').classList.add('resolved'); }, 150);
+      setTimeout(function () { document.getElementById('card2').classList.add('resolved'); }, 300);
+    }
+  }, 55);
+});
+</script>
+</body>
+</html>

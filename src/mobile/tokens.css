@@ -120,6 +120,12 @@
   --gray-7: #ffffff;
   --glass-bg: color-mix(in srgb, var(--gray-1) 82%, transparent);
   --scrim: rgba(0, 0, 0, 0.6);
+  /* dark 下 tint 改为品牌/语义色低透明度叠加，避免浅色底刺眼 */
+  --brand-tint: rgba(240, 101, 90, 0.14);
+  --danger-tint: rgba(229, 72, 77, 0.16);
+  --success-tint: rgba(47, 158, 110, 0.16);
+  --warning-tint: rgba(231, 146, 42, 0.16);
+  --brand-soft: #ff8d83;
 }
 
 /* 减少动画：时长归零（design-language.md §3.4） */

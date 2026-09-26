@@ -47,6 +47,10 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
 
   if (!visible) return null;
 
+  // portal 必须落在 .mshell 内：令牌（--scrim/--glass-bg/--gray-* 等）作用域在 .mshell，
+  // 挂到 body 会令弹层丢失全部样式（阶段 2 实测教训）。
+  const container = document.querySelector('.mshell') ?? document.body;
+
   function onPointerDown(e: React.PointerEvent): void {
     startY.current = e.clientY;
     setDragging(true);
@@ -87,7 +91,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
         <div className="msheet2-body">{children}</div>
       </div>
     </>,
-    document.body,
+    container,
   );
 }
 

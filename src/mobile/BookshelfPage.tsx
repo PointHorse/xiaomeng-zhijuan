@@ -64,6 +64,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
   const [modelDialog, setModelDialog] = useState<ModelDialogState | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressClick = useRef(false);
 
   const refresh = useCallback(async (): Promise<void> => {
     setStories(await listShelfStories());
@@ -89,6 +90,8 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
   function startPress(story: ShelfStory): void {
     pressTimer.current = setTimeout(() => {
       pressTimer.current = null;
+      // 长按进入多选后，吞掉紧随而来的 click（其闭包里 multi 仍为旧值，会误开操作 Sheet）
+      suppressClick.current = true;
       setMulti(true);
       setChecked(new Set([story.id]));
     }, 500);
@@ -194,11 +197,17 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
             onPointerUp={cancelPress}
             onPointerLeave={cancelPress}
             onContextMenu={(e) => {
-              // 桌面浏览器调试：右键等价长按
+              // Android 长按会派发 contextmenu：与长按手势一致，进入多选（§5 惯例）
               e.preventDefault();
-              setActionTarget(s);
+              suppressClick.current = true;
+              setMulti(true);
+              setChecked(new Set([s.id]));
             }}
             onClick={() => {
+              if (suppressClick.current) {
+                suppressClick.current = false;
+                return;
+              }
               if (multi) toggleChecked(s.id);
               else onOpen(s.id, s.title, s.treeJson);
             }}

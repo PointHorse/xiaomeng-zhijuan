@@ -1063,11 +1063,11 @@ body {
     font-size: 12px;
   }
 
-  /* 提示条紧凑 */
+  /* 提示条紧凑；bottom 抬高避开 Android 手势导航栏 */
   .hint-toast {
     right: 8px;
     left: 8px;
-    bottom: 8px;
+    bottom: calc(8px + 44px);
     font-size: 12px;
     text-align: center;
   }

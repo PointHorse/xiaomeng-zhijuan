@@ -90,6 +90,11 @@
   --on-brand: #ffffff;
   --spinner-track: rgba(255, 255, 255, 0.4);
   --sweep-highlight: rgba(255, 255, 255, 0.75);
+
+  /* 骨架占位底图：SVG 预渲染模糊字形（零实时 blur，阶段 3 §2）。
+     字块 fill 分 light/dark 两份，dark 由 .dark .mshell 覆盖。 */
+  --skel-fill: %23f8796f;
+  --skel-blur-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 32' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-20%25' y='-60%25' width='140%25' height='220%25'%3E%3CfeGaussianBlur stdDeviation='4'/%3E%3C/filter%3E%3Cg filter='url(%23b)' fill='%23f8796f'%3E%3Crect x='4' y='10' width='22' height='12' rx='6'/%3E%3Crect x='32' y='10' width='22' height='12' rx='6'/%3E%3Crect x='60' y='10' width='22' height='12' rx='6'/%3E%3Crect x='88' y='10' width='22' height='12' rx='6'/%3E%3Crect x='116' y='10' width='22' height='12' rx='6'/%3E%3C/g%3E%3C/svg%3E");
   --brand-shadow-soft: 0 4px 14px rgba(240, 101, 90, 0.35);
   --brand-shadow-float: 0 4px 16px rgba(240, 101, 90, 0.35);
   --brand-shadow-strong: 0 4px 22px rgba(240, 101, 90, 0.65);
@@ -126,6 +131,8 @@
   --success-tint: rgba(47, 158, 110, 0.16);
   --warning-tint: rgba(231, 146, 42, 0.16);
   --brand-soft: #ff8d83;
+  --skel-fill: %23b3544d;
+  --skel-blur-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 32' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-20%25' y='-60%25' width='140%25' height='220%25'%3E%3CfeGaussianBlur stdDeviation='4'/%3E%3C/filter%3E%3Cg filter='url(%23b)' fill='%23b3544d'%3E%3Crect x='4' y='10' width='22' height='12' rx='6'/%3E%3Crect x='32' y='10' width='22' height='12' rx='6'/%3E%3Crect x='60' y='10' width='22' height='12' rx='6'/%3E%3Crect x='88' y='10' width='22' height='12' rx='6'/%3E%3Crect x='116' y='10' width='22' height='12' rx='6'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* 减少动画：时长归零（design-language.md §3.4） */

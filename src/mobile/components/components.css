@@ -174,13 +174,23 @@
 .msheet-row2 .row-sub { font-size: var(--fs-xs); color: var(--gray-3); display: block; margin-top: 2px; }
 .msheet-sep2 { height: 1px; background: var(--gray-2); margin: var(--sp-1) 0; }
 
-/* ===== 生成中加载（模糊占位 + 扫光，Commit 3 启用） ===== */
+/* ===== 生成中加载（阶段 3 §2：SVG 预渲染模糊字形，零实时 blur） =====
+   底图 = 内联 SVG data-URI（字块 + feGaussianBlur），浏览器按位图光栅化一次；
+   扫光高光移至 ::after 独立层，仅动画 background-position。 */
 .skel-line {
+  position: relative;
   height: 1em;
-  border-radius: var(--radius-full);
   margin: 10px 0;
-  background-color: color-mix(in srgb, var(--brand-tint) 70%, var(--brand) 8%);
-  filter: blur(4px);
+  background-color: transparent;
+  background-image: var(--skel-blur-img);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.skel-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
   background-image: linear-gradient(100deg, transparent 32%, var(--sweep-highlight) 50%, transparent 68%);
   background-size: 220% 100%;
   background-repeat: no-repeat;
@@ -193,12 +203,15 @@
 .skel-wrap.is-resolving .skel-line {
   animation: m-skel-resolve var(--dur-resolve) var(--ease-standard) forwards;
 }
+.skel-wrap.is-resolving .skel-line::after {
+  animation: none;
+  opacity: 0;
+}
 @keyframes m-skel-resolve {
-  to { filter: blur(0); opacity: 0; }
+  to { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .skel-line {
-    filter: blur(2px);
+  .skel-line::after {
     animation: m-skel-breath var(--dur-breath) ease-in-out infinite;
   }
   @keyframes m-skel-breath {
@@ -290,4 +303,11 @@
   margin: 0;
   accent-color: var(--brand);
   background: transparent;
+}
+
+/* ===== 性能模式（阶段 3 §2）：去 backdrop-filter，玻璃改高不透明纯色 ===== */
+.mshell.perf .msheet2 {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: color-mix(in srgb, var(--gray-1) 97%, transparent);
 }

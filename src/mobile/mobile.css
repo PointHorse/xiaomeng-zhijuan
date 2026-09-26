@@ -657,3 +657,10 @@
 .msubpage-body main {
   height: 100%;
 }
+
+/* ===== 性能模式（阶段 3 §2）：候选抽屉玻璃降级为高不透明纯色 ===== */
+.mshell.perf .mcsheet {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: color-mix(in srgb, var(--gray-1) 97%, transparent);
+}

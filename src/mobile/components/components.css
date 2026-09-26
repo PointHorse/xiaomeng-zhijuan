@@ -127,13 +127,33 @@
   background: var(--gray-2);
   margin: 0 auto;
 }
+.msheet2-title-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-1) var(--sp-4) var(--sp-2);
+  flex: 0 0 auto;
+}
 .msheet2-title {
-  text-align: center;
   font-weight: 700;
   font-size: var(--fs-md);
   color: var(--gray-5);
-  padding: var(--sp-1) 0 var(--sp-2);
-  flex: 0 0 auto;
+  text-align: center;
+}
+.msheet2-close {
+  position: absolute;
+  right: var(--sp-4);
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--gray-4);
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 50%;
 }
 .msheet2-body {
   padding: 0 var(--sp-4) var(--sp-4);

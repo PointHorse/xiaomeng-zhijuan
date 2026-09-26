@@ -87,7 +87,14 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
         >
           <div className="msheet2-handle" />
         </div>
-        {title && <div className="msheet2-title">{title}</div>}
+        {title && (
+          <div className="msheet2-title-row">
+            <div className="msheet2-title">{title}</div>
+            <button type="button" className="msheet2-close" aria-label="关闭" onClick={onClose}>
+              ✕
+            </button>
+          </div>
+        )}
         <div className="msheet2-body">{children}</div>
       </div>
     </>,

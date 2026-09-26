@@ -181,9 +181,14 @@ function CanvasInner(): JSX.Element {
   const storyIdRef = useRef(storyId);
   useEffect(() => {
     void (async () => {
-      const saved = await loadTreeLayout(storyIdRef.current);
+      let saved: Record<string, { x: number; y: number }> = {};
+      try {
+        saved = await loadTreeLayout(storyIdRef.current);
+      } catch {
+        saved = {}; // 表缺失/查询失败：按无自定义坐标处理
+      }
       setCustomLayout(saved);
-      setLayoutLoaded(true);
+      setLayoutLoaded(true); // 无论成败都置位，保证初始 fitView 执行
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storyIdRef.current]);

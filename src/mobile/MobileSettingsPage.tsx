@@ -1,11 +1,12 @@
 /**
- * 移动版设置页（阶段 2）：模型服务 / 生成参数 / 外观 / 风格管理。
- * 全部消费设计令牌与阶段 1 组件（Button / BottomSheet / SheetRow）；
+ * 移动版设置页（阶段 2/3）：模型服务 / 生成参数 / 外观 / 体验增强 / 风格管理。
+ * 全部消费设计令牌与组件库（Button / BottomSheet / SheetRow / Switch / Slider）；
  * 与桌面 SettingsView 共享 store 与 probe/analyzer 逻辑，桌面零改动。
  */
 import { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { probeModels } from '../settings/probe';
+import { GEN_PRESETS, resolveTheme } from '../settings/settings';
 import { builtinStyles, validateCustomStyle, type StylePreset } from '../styles_ext/model';
 import { buildAnalysisUserMessage, extractStylePrompt } from '../styles_ext/analyzer';
 import { createProvider } from '../provider/openai';
@@ -13,7 +14,10 @@ import { listCustomStyles, upsertCustomStyle, deleteCustomStyle, initStyleSchema
 import { useI18n } from '../i18n/useI18n';
 import { BottomSheet, SheetRow, SheetSep } from './components/BottomSheet';
 import { Button } from './components/Button';
+import { Switch } from './components/Switch';
+import { Slider } from './components/Slider';
 import { TypographySheet } from './TypographySheet';
+import { usePerfPreferences } from './platform';
 
 type AnalysisPhase = 'idle' | 'analyzing' | 'done' | 'error';
 
@@ -45,7 +49,6 @@ export function MobileSettingsPage(): JSX.Element {
   const [probe, setProbe] = useState<{ ok: boolean; msg: string } | null>(null);
   const [probing, setProbing] = useState(false);
 
-  const [themeOpen, setThemeOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [typoOpen, setTypoOpen] = useState(false);
 
@@ -69,6 +72,16 @@ export function MobileSettingsPage(): JSX.Element {
 
   const allStyles = [...builtinStyles(), ...customStyles];
   const activeStyle = allStyles.find((s) => s.id === settings.activeStyleId) ?? allStyles[0];
+  const { perfMode, reduceMotion: reduceMotionActive } = usePerfPreferences();
+  const [systemIsDark, setSystemIsDark] = useState(
+    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches,
+  );
+  useEffect(() => {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)');
+    const onDark = (e: MediaQueryListEvent): void => setSystemIsDark(e.matches);
+    dark.addEventListener('change', onDark);
+    return () => dark.removeEventListener('change', onDark);
+  }, []);
 
   async function runProbe(): Promise<void> {
     setProbing(true);
@@ -170,7 +183,6 @@ export function MobileSettingsPage(): JSX.Element {
     setDeleteTarget(null);
   }
 
-  const themeLabel = settings.theme === 'dark' ? '🌙 深色' : settings.theme === 'light' ? '☀️ 浅色' : '⚙ 跟随系统';
   const langLabel = lang === 'zh' ? '中文' : 'English';
 
   return (
@@ -242,41 +254,97 @@ export function MobileSettingsPage(): JSX.Element {
         )}
       </Section>
 
-      {/* ============ 生成参数 ============ */}
+      {/* ============ 生成参数（阶段 3 §3：滑杆 + 实时数值 + 预设吸附） ============ */}
       <Section title="生成参数">
-        <div className="mfield">
-          <label>温度（0–2）</label>
-          <input type="number" step="0.1" min="0" max="2" value={settings.temperature} onChange={(e) => setSettings({ temperature: Number(e.target.value) })} />
-        </div>
-        <div className="mfield">
-          <label>Top P（0–1）</label>
-          <input type="number" step="0.01" min="0" max="1" value={settings.topP} onChange={(e) => setSettings({ topP: Number(e.target.value) })} />
-        </div>
-        <div className="mfield">
-          <label>最大生成长度（tokens）</label>
-          <input type="number" min="100" step="100" value={settings.maxTokens} onChange={(e) => setSettings({ maxTokens: Number(e.target.value) })} />
-        </div>
-        <div className="mfield">
-          <label>记忆窗口（字）</label>
-          <input type="number" min="500" step="500" value={settings.contextWindow} onChange={(e) => setSettings({ contextWindow: Number(e.target.value) })} />
-        </div>
+        <Slider
+          label="温度"
+          min={0}
+          max={2}
+          step={0.1}
+          value={settings.temperature}
+          onChange={(v) => setSettings({ temperature: v })}
+          snapPoints={[GEN_PRESETS.conservative.temperature, GEN_PRESETS.balanced.temperature, GEN_PRESETS.wild.temperature]}
+        />
+        <Slider
+          label="Top P"
+          min={0.5}
+          max={1}
+          step={0.01}
+          value={settings.topP}
+          onChange={(v) => setSettings({ topP: v })}
+          snapPoints={[GEN_PRESETS.conservative.topP, GEN_PRESETS.balanced.topP, GEN_PRESETS.wild.topP]}
+        />
+        <Slider
+          label="最大生成长度"
+          min={200}
+          max={8000}
+          step={100}
+          value={settings.maxTokens}
+          unit=" tokens"
+          onChange={(v) => setSettings({ maxTokens: v })}
+          snapPoints={[GEN_PRESETS.conservative.maxTokens, GEN_PRESETS.balanced.maxTokens, GEN_PRESETS.wild.maxTokens, 4000]}
+        />
+        <Slider
+          label="记忆窗口"
+          min={1000}
+          max={20000}
+          step={500}
+          value={settings.contextWindow}
+          unit=" 字"
+          onChange={(v) => setSettings({ contextWindow: v })}
+        />
+        <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--gray-3)', margin: 'var(--sp-1) 0 0' }}>
+          预设档位：保守 {GEN_PRESETS.conservative.temperature} / 平衡 {GEN_PRESETS.balanced.temperature} / 脑洞 {GEN_PRESETS.wild.temperature}（滑杆靠近时自动吸附）
+        </p>
       </Section>
 
-      {/* ============ 外观 ============ */}
+      {/* ============ 外观（阶段 3 §1②：开关性质全部 Switch） ============ */}
       <Section title="外观">
-        <SheetRow
-          icon={themeLabel.split(' ')[0]}
-          sub={`当前 ${themeLabel.split(' ')[1] ?? ''}`}
-          onClick={() => setThemeOpen(true)}
-        >
-          明暗主题
-        </SheetRow>
+        <Switch
+          icon="🌙"
+          label="深色模式"
+          sub={settings.theme === 'system' ? '当前跟随系统，关闭此项后可手动选择' : undefined}
+          checked={settings.theme === 'dark' || (settings.theme === 'system' && systemIsDark)}
+          onChange={(next) => setSettings({ theme: next ? 'dark' : 'light' })}
+        />
+        <Switch
+          icon="⚙"
+          label="跟随系统"
+          sub="开启后深色模式随系统自动切换"
+          checked={settings.theme === 'system'}
+          onChange={(next) => setSettings({ theme: next ? 'system' : resolveTheme(settings.theme) === 'dark' ? 'dark' : 'light' })}
+        />
         <SheetRow icon="🌐" sub={`当前 ${langLabel}`} onClick={() => setLangOpen(true)}>
           界面语言
         </SheetRow>
         <SheetRow icon="🅰" sub="字号 / 行距 / 字体" onClick={() => setTypoOpen(true)}>
           字号与排版
         </SheetRow>
+      </Section>
+
+      {/* ============ 体验增强（阶段 3 §1②/§2） ============ */}
+      <Section title="体验增强">
+        <Switch
+          icon="📳"
+          label="触感反馈"
+          sub="主要动作时轻微震动（仅 Android 生效）"
+          checked={settings.hapticsEnabled ?? true}
+          onChange={(next) => setSettings({ hapticsEnabled: next })}
+        />
+        <Switch
+          icon="🚄"
+          label="性能模式"
+          sub="去掉毛玻璃与模糊效果，低端机更流畅"
+          checked={perfMode}
+          onChange={(next) => setSettings({ performanceMode: next })}
+        />
+        <Switch
+          icon="🌀"
+          label="减少动画"
+          sub={settings.reduceMotionOverride ? '已强制开启' : '默认跟随系统设置'}
+          checked={reduceMotionActive}
+          onChange={(next) => setSettings({ reduceMotionOverride: next })}
+        />
       </Section>
 
       {/* ============ 风格管理 ============ */}
@@ -312,26 +380,6 @@ export function MobileSettingsPage(): JSX.Element {
       </Section>
 
       {/* ============ Sheets ============ */}
-      <BottomSheet open={themeOpen} onClose={() => setThemeOpen(false)} title="明暗主题">
-        {([
-          { v: 'light', label: '☀️ 浅色' },
-          { v: 'dark', label: '🌙 深色' },
-          { v: 'system', label: '⚙ 跟随系统' },
-        ] as const).map((o) => (
-          <SheetRow
-            key={o.v}
-            selected={settings.theme === o.v}
-            onClick={() => {
-              setSettings({ theme: o.v });
-              void import('../settings/theme').then((m) => m.applyTheme(o.v));
-              setThemeOpen(false);
-            }}
-          >
-            {o.label}
-          </SheetRow>
-        ))}
-      </BottomSheet>
-
       <BottomSheet open={langOpen} onClose={() => setLangOpen(false)} title="界面语言">
         {([
           { v: 'zh', label: '中文' },

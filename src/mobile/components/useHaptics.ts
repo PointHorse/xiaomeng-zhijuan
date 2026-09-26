@@ -27,6 +27,15 @@ export function dispatchHaptic(
 /* istanbul ignore next — 插件动态导入，单测中以 vi.mock 或 dispatchHaptic 覆盖 */
 export async function haptic(kind: HapticKind = 'light'): Promise<void> {
   if (typeof globalThis === 'undefined' || !('__TAURI_INTERNALS__' in globalThis)) return;
+  // 用户开关（设置页「触感反馈」），缺省开启
+  let enabled = true;
+  try {
+    const { useStore } = await import('../../store/useStore');
+    enabled = useStore.getState().settings.hapticsEnabled ?? true;
+  } catch {
+    /* store 不可用时按开启处理 */
+  }
+  if (!enabled) return;
   try {
     const m = (await import('@tauri-apps/plugin-haptics')) as Parameters<typeof dispatchHaptic>[0];
     dispatchHaptic(m, kind);

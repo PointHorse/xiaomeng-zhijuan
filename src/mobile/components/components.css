@@ -224,3 +224,70 @@
     animation-delay: var(--skel-delay, 0s);
   }
 }
+
+/* ===== Switch（阶段 3 §3） ===== */
+.mswitch-wrap { display: block; }
+.mswitch-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--sp-2) var(--sp-3);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  color: var(--gray-5);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.mswitch-row:active:not(:disabled) { background: var(--gray-2); }
+.mswitch-row--disabled { opacity: 0.55; cursor: not-allowed; }
+.mswitch-main { flex: 1; min-width: 0; display: block; }
+.mswitch-label { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-md); }
+.mswitch-icon { font-size: var(--fs-md); }
+.mswitch-sub { display: block; font-size: var(--fs-xs); color: var(--gray-3); margin-top: 2px; }
+.mswitch-track {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--gray-2);
+  position: relative;
+  transition: background-color var(--dur-base) var(--ease-standard);
+}
+.mswitch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.mswitch-row[aria-checked='true'] .mswitch-track { background: var(--brand); }
+.mswitch-row[aria-checked='true'] .mswitch-thumb { transform: translateX(18px); }
+.mswitch-row:focus-visible { outline: 3px solid var(--brand-soft); outline-offset: 2px; }
+.mswitch-reason { display: block; font-size: var(--fs-xs); color: var(--gray-3); padding-left: var(--sp-3); }
+
+/* ===== Slider（阶段 3 §3） ===== */
+.mslider { display: block; padding: var(--sp-2) 0; }
+.mslider-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--sp-1);
+}
+.mslider-label { font-size: var(--fs-sm); color: var(--gray-3); }
+.mslider-value { font-size: var(--fs-md); font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
+.mslider input[type='range'] {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  accent-color: var(--brand);
+  background: transparent;
+}

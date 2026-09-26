@@ -21,6 +21,12 @@ export interface AppSettings {
   fontSize: number;
   lineHeight: number;
   fontFamily: string;
+  /** 触感反馈开关（Android；缺省 = 开启，桌面无效） */
+  hapticsEnabled?: boolean;
+  /** 性能模式：去玻璃 blur、去实时模糊（缺省时按设备能力自动判定） */
+  performanceMode?: boolean;
+  /** 强制减少动画（缺省跟随系统 prefers-reduced-motion） */
+  reduceMotionOverride?: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {

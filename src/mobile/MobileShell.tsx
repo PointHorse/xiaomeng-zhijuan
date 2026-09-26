@@ -11,6 +11,7 @@ import { BookshelfPage } from './BookshelfPage';
 import { WorldTreeView } from '../worldtree/WorldTreeView';
 import { DashboardView } from '../dashboard/DashboardView';
 import { MobileSettingsPage } from './MobileSettingsPage';
+import { usePerfPreferences } from './platform';
 import './tokens.css';
 import './mobile.css';
 
@@ -20,6 +21,7 @@ export function MobileShell() {
   const [page, setPage] = useState<MobilePage>('editor');
   const storyId = useStore((s) => s.storyId);
   const loadStoryAction = useStore((s) => s.loadStory);
+  const perf = usePerfPreferences();
 
   async function openStory(id: string, t: string, treeJson: string): Promise<void> {
     try {
@@ -71,7 +73,7 @@ export function MobileShell() {
   }
 
   return (
-    <div className="mshell">
+    <div className={`mshell ${perf.perfMode ? 'perf' : ''} ${perf.reduceMotion ? 'reduce-motion' : ''}`}>
       <MobileTopBar
         onNew={() => useStore.getState().newStory('未命名故事', '')}
         onOpenShelf={() => setPage('shelf')}

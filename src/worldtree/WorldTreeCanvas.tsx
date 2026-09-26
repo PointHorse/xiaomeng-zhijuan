@@ -97,12 +97,16 @@ export function makeStressTree(count: number): StoryTree {
   const nodes: StoryTree['nodes'] = {};
   nodes['s0'] = { id: 's0', parentId: null, text: '压测根节点', candidates: [], chosenCandidateId: null, source: 'user', createdAt: 0 };
   for (let i = 1; i <= count; i++) {
+    const main = `压测节点 ${i}：夜风掠过高粱地，叶子沙沙作响，像谁在暗处数着拍子。`;
     nodes[`s${i}`] = {
       id: `s${i}`,
       parentId: `s${Math.max(0, Math.floor((i - 1) * 0.985))}`,
-      text: `压测节点 ${i}：夜风掠过高粱地，叶子沙沙作响，像谁在暗处数着拍子。`,
-      candidates: [],
-      chosenCandidateId: null,
+      text: main,
+      candidates: [
+        { id: `c${i}a`, text: main, createdAt: i },
+        { id: `c${i}b`, text: `${main}（未采纳分支）`, createdAt: i + 0.5 },
+      ],
+      chosenCandidateId: `c${i}a`,
       source: 'ai',
       createdAt: i,
     };
@@ -123,6 +127,7 @@ function CanvasInner(): JSX.Element {
   const [preview, setPreview] = useState<string | null>(null);
   const [actionNodeId, setActionNodeId] = useState<string | null>(null);
   const [stressCount, setStressCount] = useState(0);
+  const [layoutLoaded, setLayoutLoaded] = useState(false);
   const suppressClick = useRef(false);
   const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -146,10 +151,19 @@ function CanvasInner(): JSX.Element {
 
   const [nodes, setNodes] = useState<Node<WcNodeData>[]>(flow.nodes);
   const [edges, setEdges] = useState<Edge[]>(flow.edges);
+  const didFocus = useRef(false);
   useEffect(() => {
     setNodes(flow.nodes);
     setEdges(flow.edges);
-  }, [flow]);
+    if (!didFocus.current && flow.nodes.length > 0 && layoutLoaded) {
+      didFocus.current = true;
+      setTimeout(() => {
+        const tl = timeline(sourceTree);
+        const cur = tl[tl.length - 1];
+        if (cur) fitView({ nodes: [{ id: cur.id }], duration: 400, maxZoom: 1.2, padding: 0.4 });
+      }, 80);
+    }
+  }, [flow, layoutLoaded, sourceTree, fitView]);
 
   // 语义缩放：<55% 节点退化序号圆点（监视视口 transform）
   useEffect(() => {
@@ -169,11 +183,7 @@ function CanvasInner(): JSX.Element {
     void (async () => {
       const saved = await loadTreeLayout(storyIdRef.current);
       setCustomLayout(saved);
-      setTimeout(() => {
-        const tl = timeline(sourceTree);
-        const cur = tl[tl.length - 1];
-        if (cur) fitView({ nodes: [{ id: cur.id }], duration: 400, maxZoom: 1.2, padding: 0.4 });
-      }, 120);
+      setLayoutLoaded(true);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storyIdRef.current]);
@@ -297,7 +307,10 @@ function CanvasInner(): JSX.Element {
           variant="ghost"
           size="sm"
           aria-label="切换 500 节点压测演示"
-          onClick={() => setStressCount((v) => (v > 0 ? 0 : 500))}
+          onClick={() => {
+            setStressCount((v) => (v > 0 ? 0 : 500));
+            setTimeout(() => fitView({ duration: 500, padding: 0.15 }), 350);
+          }}
         >
           {stressCount > 0 ? '退出压测' : '压测 500'}
         </Button>

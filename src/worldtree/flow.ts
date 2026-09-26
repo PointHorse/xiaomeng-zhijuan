@@ -150,18 +150,31 @@ export function buildFlow(
 
   const edges: Edge[] = [];
   for (const n of Object.values(tree.nodes)) {
-    if (!n.parentId || !visible.has(n.id) || !visible.has(n.parentId)) continue;
-    const hot = states[n.id] === 'adopted' && states[n.parentId] === 'adopted' && visible.has(tree.currentId);
-    // 主干高亮：父与子都为主干（adopted）——但历史采纳过的旁支也会是 adopted？
-    // buildStates 只把"根→当前"标 adopted，历史旁支在 states 中为 cand/discarded，正确。
-    edges.push({
-      id: `e-${n.parentId}-${n.id}`,
-      source: n.parentId,
-      target: n.id,
-      type: 'default',
-      animated: hot,
-      style: hot ? { stroke: 'var(--brand)', strokeWidth: 2.5 } : { stroke: 'var(--gray-2)', strokeWidth: 2 },
-    });
+    if (!visible.has(n.id)) continue;
+    if (n.parentId && visible.has(n.parentId)) {
+      const hot = states[n.id] === 'adopted' && states[n.parentId] === 'adopted';
+      edges.push({
+        id: `e-${n.parentId}-${n.id}`,
+        source: n.parentId,
+        target: n.id,
+        type: 'default',
+        animated: hot,
+        style: hot ? { stroke: 'var(--brand)', strokeWidth: 2.5 } : { stroke: 'var(--gray-2)', strokeWidth: 2 },
+      });
+    }
+    // 未采纳候选 → 虚拟节点虚线短边（折叠时一并隐藏）
+    if (opts.collapsed.has(n.id)) continue;
+    for (const c of n.candidates) {
+      if (c.id === n.chosenCandidateId && states[n.id] === 'adopted') continue;
+      edges.push({
+        id: `ev-${n.id}-${c.id}`,
+        source: n.id,
+        target: `v-${n.id}-${c.id}`,
+        type: 'default',
+        animated: false,
+        style: { stroke: 'var(--gray-2)', strokeWidth: 1.5, strokeDasharray: '4 4' },
+      });
+    }
   }
   return { nodes, edges };
 }

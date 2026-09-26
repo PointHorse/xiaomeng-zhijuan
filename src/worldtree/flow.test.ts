@@ -128,13 +128,19 @@ describe('makeStressTree 压测树', () => {
     expect(t.currentId).toBe('s500');
   });
 
-  it('500 节点 flow 构建在可接受时间内（性能护栏）', () => {
+  it('500 节点 flow 构建（含候选虚拟节点）在可接受时间内（性能护栏）', () => {
     const t = makeStressTree(500);
     const states = buildStates(t);
+    // 期望节点 = 真实节点 + 每个节点的未采纳候选（adopted 节点排除其 chosen 候选）
+    let virtual = 0;
+    for (const n of Object.values(t.nodes)) {
+      virtual += n.candidates.filter((c) => !(c.id === n.chosenCandidateId && states[n.id] === 'adopted')).length;
+    }
     const t0 = performance.now();
     const flow = buildFlow(t, { positions: {}, layout: {}, collapsed: new Set(), states, ordering: buildOrdering(t) });
     const ms = performance.now() - t0;
-    expect(flow.nodes.length).toBe(501);
+    expect(flow.nodes.length).toBe(501 + virtual);
+    expect(flow.edges.length).toBe(500 + virtual);
     expect(ms).toBeLessThan(500); // 纯映射应在毫秒级，500ms 为护栏上限
   });
 });

@@ -79,6 +79,21 @@
   --spring-stiffness: 380;
   --spring-damping: 26;
 
+  /* 循环动画节奏（转场时长上限见动效原则；循环类独立令牌） */
+  --dur-spin: 800ms;    /* 按钮 spinner */
+  --dur-sweep: 1400ms;  /* 骨架扫光 */
+  --dur-resolve: 300ms; /* 占位→真实文字过渡 */
+  --dur-breath: 2400ms; /* reduced-motion 呼吸 */
+  --dur-breathe: 1600ms;/* 悬浮球呼吸 */
+
+  /* 品牌反白文字与品牌投影三阶 */
+  --on-brand: #ffffff;
+  --spinner-track: rgba(255, 255, 255, 0.4);
+  --sweep-highlight: rgba(255, 255, 255, 0.75);
+  --brand-shadow-soft: 0 4px 14px rgba(240, 101, 90, 0.35);
+  --brand-shadow-float: 0 4px 16px rgba(240, 101, 90, 0.35);
+  --brand-shadow-strong: 0 4px 22px rgba(240, 101, 90, 0.65);
+
   /* ── 桥接层：旧名 → 新令牌（mobile.css 既有规则零改动即生效） ── */
   --accent: var(--brand);
   --accent-hover: var(--brand-strong);

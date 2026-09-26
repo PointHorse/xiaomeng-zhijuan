@@ -35,7 +35,7 @@
 .m-btn:focus-visible { outline: 3px solid var(--brand-soft); outline-offset: 2px; }
 .m-btn[disabled] { opacity: 0.55; cursor: not-allowed; }
 
-.m-btn--primary { background: var(--brand); color: #fff; box-shadow: var(--shadow-float); }
+.m-btn--primary { background: var(--brand); color: var(--on-brand); box-shadow: var(--shadow-float); }
 .m-btn--primary:active:not(:disabled) { background: var(--brand-strong); }
 .m-btn--secondary {
   background: var(--gray-1);
@@ -44,7 +44,7 @@
   box-shadow: var(--shadow-1);
 }
 .m-btn--secondary:active:not(:disabled) { background: var(--gray-2); }
-.m-btn--danger { background: var(--danger); color: #fff; }
+.m-btn--danger { background: var(--danger); color: var(--on-brand); }
 .m-btn--danger:active:not(:disabled) { background: var(--danger-strong); }
 .m-btn--ghost { background: transparent; color: var(--gray-4); }
 .m-btn--ghost:active:not(:disabled) { background: var(--gray-2); }
@@ -53,9 +53,9 @@
   width: 15px;
   height: 15px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #fff;
-  animation: m-spin 0.8s linear infinite;
+  border: 2px solid var(--spinner-track);
+  border-top-color: var(--on-brand);
+  animation: m-spin var(--dur-spin) linear infinite;
   flex: 0 0 auto;
 }
 .m-btn--secondary .m-btn-spin,
@@ -181,17 +181,17 @@
   margin: 10px 0;
   background-color: color-mix(in srgb, var(--brand-tint) 70%, var(--brand) 8%);
   filter: blur(4px);
-  background-image: linear-gradient(100deg, transparent 32%, rgba(255, 255, 255, 0.75) 50%, transparent 68%);
+  background-image: linear-gradient(100deg, transparent 32%, var(--sweep-highlight) 50%, transparent 68%);
   background-size: 220% 100%;
   background-repeat: no-repeat;
-  animation: m-skel-sweep 1.4s linear infinite;
+  animation: m-skel-sweep var(--dur-sweep) linear infinite;
 }
 @keyframes m-skel-sweep {
   from { background-position: 130% 0; }
   to { background-position: -90% 0; }
 }
 .skel-wrap.is-resolving .skel-line {
-  animation: m-skel-resolve 300ms var(--ease-standard) forwards;
+  animation: m-skel-resolve var(--dur-resolve) var(--ease-standard) forwards;
 }
 @keyframes m-skel-resolve {
   to { filter: blur(0); opacity: 0; }
@@ -199,7 +199,7 @@
 @media (prefers-reduced-motion: reduce) {
   .skel-line {
     filter: blur(2px);
-    animation: m-skel-breath 2.4s ease-in-out infinite;
+    animation: m-skel-breath var(--dur-breath) ease-in-out infinite;
   }
   @keyframes m-skel-breath {
     50% { opacity: 0.55; }

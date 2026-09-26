@@ -8,7 +8,7 @@ import { MobileTopBar } from './MobileTopBar';
 import { MobileEditor } from './MobileEditor';
 import { CandidateSheet } from './CandidateSheet';
 import { BookshelfPage } from './BookshelfPage';
-import { WorldTreeView } from '../worldtree/WorldTreeView';
+import { WorldTreeCanvas } from '../worldtree/WorldTreeCanvas';
 import { MobileDashboardPage } from './MobileDashboardPage';
 import { MobileSettingsPage } from './MobileSettingsPage';
 import { usePerfPreferences } from './platform';
@@ -63,8 +63,8 @@ export function MobileShell() {
           </button>
           <div className="msub-title">{titleMap[page]}</div>
         </div>
-        <div className="msubpage-body">
-          {page === 'worldtree' && <WorldTreeView />}
+        <div className="msubpage-body msubpage-canvas-host">
+          {page === 'worldtree' && <WorldTreeCanvas />}
           {page === 'dashboard' && <MobileDashboardPage />}
           {page === 'settings' && <MobileSettingsPage />}
         </div>

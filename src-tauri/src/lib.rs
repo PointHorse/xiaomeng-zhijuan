@@ -100,6 +100,18 @@ pub fn run() {
                 updated_at INTEGER NOT NULL
               );",
         kind: MigrationKind::Up,
+    }, Migration {
+        version: 2,
+        // 世界树画布视图层：节点坐标（可删除，删除不影响任何故事内容）
+        description: "create_tree_layout",
+        sql: "CREATE TABLE IF NOT EXISTS tree_layout (
+                story_id TEXT NOT NULL,
+                node_id TEXT NOT NULL,
+                x REAL NOT NULL,
+                y REAL NOT NULL,
+                PRIMARY KEY (story_id, node_id)
+              );",
+        kind: MigrationKind::Up,
     }];
 
     let builder = tauri::Builder::default()

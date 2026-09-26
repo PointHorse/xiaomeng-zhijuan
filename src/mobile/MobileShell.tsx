@@ -9,7 +9,7 @@ import { MobileEditor } from './MobileEditor';
 import { CandidateSheet } from './CandidateSheet';
 import { BookshelfPage } from './BookshelfPage';
 import { WorldTreeView } from '../worldtree/WorldTreeView';
-import { DashboardView } from '../dashboard/DashboardView';
+import { MobileDashboardPage } from './MobileDashboardPage';
 import { MobileSettingsPage } from './MobileSettingsPage';
 import { usePerfPreferences } from './platform';
 import './tokens.css';
@@ -65,7 +65,7 @@ export function MobileShell() {
         </div>
         <div className="msubpage-body">
           {page === 'worldtree' && <WorldTreeView />}
-          {page === 'dashboard' && <DashboardView />}
+          {page === 'dashboard' && <MobileDashboardPage />}
           {page === 'settings' && <MobileSettingsPage />}
         </div>
       </div>

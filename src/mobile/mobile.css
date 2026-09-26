@@ -664,3 +664,56 @@
   -webkit-backdrop-filter: none;
   background: color-mix(in srgb, var(--gray-1) 97%, transparent);
 }
+
+/* ===== 移动版仪表盘（阶段 3 §4） ===== */
+.mdash-entry {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--gray-1);
+  border: 1px solid var(--gray-2);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-3);
+  cursor: pointer;
+  font: inherit;
+  color: var(--gray-5);
+  min-height: 56px;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.mdash-entry:active { background: var(--gray-2); }
+.mdash-meta {
+  display: flex;
+  gap: var(--sp-3);
+  font-size: var(--fs-xs);
+  color: var(--gray-3);
+  margin-bottom: var(--sp-1);
+}
+.mdash-preview {
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--gray-4);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mdash-cand {
+  border: 1px solid var(--gray-2);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-3);
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  color: var(--gray-5);
+}
+.mdash-cand.chosen {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+}
+.mdash-cand-tag {
+  font-size: var(--fs-xs);
+  color: var(--gray-3);
+  margin-bottom: 4px;
+}
+.mdash-cand.chosen .mdash-cand-tag { color: var(--brand); font-weight: 700; }

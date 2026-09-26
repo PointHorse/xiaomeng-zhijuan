@@ -61,7 +61,18 @@
 
 - ① vitest 143/143 全绿（无 fast-check：worldtree **不存在** property-based 测试，现有 tree.test.ts 12 例全过）；tsc 零错误；Windows 端 `tauri build` 出包且渲染路径未改（本阶段改动全部限定 `src/mobile/**` 与文档）。
 - ② 截图：设置页（Switch+滑杆）`360-7/8-perf-switch.png`、`320-settings.png`；仪表盘、世界树全景/局部/预览/操作/折叠/500 节点远景**待原型确认后随正式版补齐**。
-- ③ 出包：`DCR-v0.3.0-<shorthash>.apk` 与 Windows NSIS 安装包（见提交附件/项目根）。
+- ③ 出包（最终提交 6cc5a33）：`DCR-v0.3.0-6cc5a33.apk`（apksigner 验签通过）+ `src-tauri/target/release/bundle/nsis/DreamCore-revival_0.3.0_x64-setup.exe`。
+
+## §5 世界树正式版模拟器验证补充（6cc5a33）
+
+- 445 字真实故事画布全景：主干 #1（红边条）→ #2●当前（436 字已采纳）+ 未采纳候选虚拟节点（浅粉虚线）+ 折叠钮 + 小地图（`360-wt-1-panorama.png`）
+- 「回到当前」fitView 定位当前节点（`360-wt-2-zoom.png`，局部视图）
+- 轻点节点 → 全文预览弹层（`360-wt-3-preview.png`，436 字全文）
+- 长按节点 → 操作弹层：回溯/从此处继续写/重命名（占位）/删除=回退到父节点（`360-wt-4-actions.png`）
+- 500 节点压测远景：语义缩放圆点态（`360-wt-6-stress500.png`、`360-wt-7-semantic-zoom.png`）
+- 帧率（软渲染模拟器）：树平移 p50 24ms/18% janky；500 节点远景平移 p50 250ms（软渲染全要素在视口内的极端情况，真机 GPU 待复测；降级已内置：语义缩放圆点 + onlyRenderVisibleElements）
+- 折叠交互：visibility/badge 纯函数测试 2 条 + 原型可演示；模拟器实拍受放大态坐标限制未定格，功能经测试覆盖
+- 修复记录：fitView 时序（节点就位后才聚焦，原 120ms 早于渲染导致 no-op）、折叠时虚拟候选一并隐藏、树 layout 加载防御性降级
 - ④ **当前最不满意的三处**：
   1. 世界树正式版尚未落地——原型手势虽全，但真实树数据（tree_layout 持久化、elkjs 自动布局、可视区渲染）都还没接，30 节点原型与 500 节点目标之间还有可视区渲染这道坎。
   2. 设置页测试连接成功后不能顺带展示"可用模型列表选择"（现在只自动填第一个空模型名），用户仍需手打模型名。

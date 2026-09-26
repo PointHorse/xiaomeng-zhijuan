@@ -26,7 +26,7 @@ function sampleTree() {
   moveTo(t, a.id);
   const b = growWithCandidates(t, [cand('B 被采纳', 'cb1')], 0);
   const w = growWithCandidates(t, [cand('W1', 'cw1'), cand('W2', 'cw2')], 0);
-  void side; void w;
+  void side; void b; void w;
   return t;
 }
 

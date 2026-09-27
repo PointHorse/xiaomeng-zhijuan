@@ -15,7 +15,8 @@ import {
   type ShelfFolder,
   type ShelfStory,
 } from '../shelf/shelf';
-import { buildTxtExport } from '../export/exporters';
+import { buildTxtExport, buildJsonExport } from '../export/exporters';
+import { buildMdExport } from '../export/shareImage';
 import { writeExportFile } from '../store/persist';
 import { showToast } from '../components/toast';
 import { BottomSheet, SheetRow, SheetSep } from './components/BottomSheet';
@@ -125,12 +126,15 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
     showToast(`已删除 ${ids.length} 个故事`);
   }
 
-  async function doExport(story: ShelfStory): Promise<void> {
+  async function doExport(story: ShelfStory, kind: 'txt' | 'json' | 'md'): Promise<void> {
     try {
       const tree = JSON.parse(story.treeJson) as never;
-      const content = buildTxtExport(story.title, tree);
-      await writeExportFile(`${story.title || '未命名故事'}.txt`, content);
-      showToast(`已导出「${story.title}」.txt`);
+      const content =
+        kind === 'json' ? buildJsonExport(story.title, tree)
+        : kind === 'md' ? buildMdExport(story.title, tree)
+        : buildTxtExport(story.title, tree);
+      await writeExportFile(`${story.title || '未命名故事'}.${kind}`, content);
+      showToast(`已导出「${story.title}」.${kind}`);
     } catch (e) {
       showToast(`导出失败：${e instanceof Error ? e.message : String(e)}`);
     }
@@ -289,13 +293,31 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
               {mobileCopy.multiSelect}
             </SheetRow>
             <SheetRow
-              icon="⬇"
+              icon="download"
               onClick={() => {
-                void doExport(actionTarget);
+                void doExport(actionTarget, 'txt');
                 setActionTarget(null);
               }}
             >
               {mobileCopy.export} TXT
+            </SheetRow>
+            <SheetRow
+              icon="download"
+              onClick={() => {
+                void doExport(actionTarget, 'json');
+                setActionTarget(null);
+              }}
+            >
+              {mobileCopy.export} JSON
+            </SheetRow>
+            <SheetRow
+              icon="download"
+              onClick={() => {
+                void doExport(actionTarget, 'md');
+                setActionTarget(null);
+              }}
+            >
+              {mobileCopy.export} MD
             </SheetRow>
             <SheetRow
               icon="zap"

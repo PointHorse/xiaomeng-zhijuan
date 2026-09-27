@@ -14,6 +14,7 @@ import { showToast } from '../components/toast';
 import { Icon } from '../components/Icon';
 import { probeModels } from '../settings/probe';
 import { saveOverride, loadOverride } from '../shelf/storyOverride';
+import { renderShareDataUrl } from '../export/shareImage';
 
 interface Props {
   onNew: () => void;
@@ -38,6 +39,7 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
   const [modelOpen, setModelOpen] = useState(false);
   const [styleOpen, setStyleOpen] = useState(false);
   const [typoOpen, setTypoOpen] = useState(false);
+  const [pngPreview, setPngPreview] = useState<{ dataUrl: string; fallbackName: string } | null>(null);
   const settings = useStore((s) => s.settings);
   const setSettings = useStore((s) => s.setSettings);
   const storyId = useStore((s) => s.storyId);
@@ -307,7 +309,54 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
           onOpenPage={onOpenPage}
           onModel={() => setModelOpen(true)}
           onTypography={() => setTypoOpen(true)}
+          onPngPreview={setPngPreview}
         />
+      </BottomSheet>
+
+      {/* ===== 长图预览（阶段 3.5 §2 找回） ===== */}
+      <BottomSheet open={pngPreview !== null} onClose={() => setPngPreview(null)} title="分享长图预览">
+        {pngPreview && (
+          <>
+            <img
+              src={pngPreview.dataUrl}
+              alt="分享长图预览"
+              style={{ width: '100%', borderRadius: 'var(--radius-sm)', border: '1px solid var(--gray-2)' }}
+            />
+            <div style={{ display: 'flex', gap: 'var(--sp-3)', marginTop: 'var(--sp-3)' }}>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  void (async () => {
+                    try {
+                      const { appDataDir, join } = await import('@tauri-apps/api/path');
+                      const { invoke } = await import('@tauri-apps/api/core');
+                      const dir = await appDataDir();
+                      const path = await join(dir, pngPreview.fallbackName);
+                      const b64 = pngPreview.dataUrl.split(',')[1];
+                      await invoke('export_base64_file', { path, contentsB64: b64 });
+                      showToast(`已保存：${path}`);
+                    } catch (e) {
+                      showToast(`保存失败：${e instanceof Error ? e.message : String(e)}`);
+                    }
+                  })();
+                }}
+              >
+                保存到应用目录
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  void navigator.clipboard.writeText(pngPreview.dataUrl).then(
+                    () => showToast('已复制（dataUrl）'),
+                    () => showToast('复制失败'),
+                  );
+                }}
+              >
+                复制
+              </Button>
+            </div>
+          </>
+        )}
       </BottomSheet>
 
       <TypographySheet open={typoOpen} onClose={() => setTypoOpen(false)} />
@@ -320,11 +369,13 @@ function MoreMenu({
   onOpenPage,
   onModel,
   onTypography,
+  onPngPreview,
 }: {
   onClose: () => void;
   onOpenPage: (p: MobilePage) => void;
   onModel: () => void;
   onTypography: () => void;
+  onPngPreview: (r: { dataUrl: string; fallbackName: string }) => void;
 }): JSX.Element {
   const isDark = document.documentElement.classList.contains('dark');
   return (
@@ -390,15 +441,14 @@ function MoreMenu({
       <SheetRow
         icon="image"
         onClick={() => {
-          void import('../export/shareImage').then(async (m) => {
-            const s = useStore.getState();
+          void (async () => {
             try {
-              const r = await m.renderAndSaveShareImage({ title: s.title, tree: s.tree });
-              showToast(r.path ? `长图已保存：${r.path}` : '已取消保存');
+              const st = useStore.getState();
+              onPngPreview(renderShareDataUrl({ title: st.title, tree: st.tree }));
             } catch (e) {
-              showToast(`长图保存失败：${e instanceof Error ? e.message : String(e)}`);
+              showToast(`长图生成失败：${e instanceof Error ? e.message : String(e)}`);
             }
-          });
+          })();
           onClose();
         }}
       >

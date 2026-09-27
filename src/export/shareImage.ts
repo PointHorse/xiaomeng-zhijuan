@@ -125,6 +125,12 @@ export interface ShareSaveResult {
 }
 
 /** DCR③ 渲染并保存长图：Tauri 系统对话框 + Rust 落盘；浏览器降级为下载 */
+/** 移动端：仅渲染分享长图（不弹保存框），由调用方决定保存/预览方式 */
+export function renderShareDataUrl(opts: ShareImageOptions): { dataUrl: string; fallbackName: string } {
+  const canvas = renderShareImage(opts);
+  return { dataUrl: canvas.toDataURL('image/png'), fallbackName: `${opts.title || 'DreamCore'}-分享.png` };
+}
+
 export async function renderAndSaveShareImage(opts: ShareImageOptions): Promise<ShareSaveResult> {
   const canvas = renderShareImage(opts);
   const dataUrl = canvas.toDataURL('image/png');

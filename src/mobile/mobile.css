@@ -54,24 +54,24 @@
   background: var(--accent-soft);
 }
 
-/* 居中标题区：弹性占据中部，文字居中 */
-.mtopbar-center {
+/* 双胶囊容器（阶段 3.5 §4）：占据中部，双胶囊自适应+截断 */
+.mtopbar-capsules {
   flex: 1;
-  text-align: center;
-  font-size: 17px;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
   min-width: 0;
 }
+.mtopbar--dual .micon-btn { flex: 0 0 auto; }
 
 /* 珊瑚红胶囊：模型/风格选择（参照图 1「小梦0号」按钮） */
 .mtopbar-capsule {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  max-width: 40vw;
+  min-width: 0;
+  max-width: 100%;
   height: 32px;
   padding: 0 12px;
   border: none;
@@ -84,12 +84,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.mtopbar-capsule--style {
+  background: var(--gray-1);
+  color: var(--gray-5);
+  border: 1px solid var(--gray-2);
+}
+.mtopbar-capsule .cap-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .mtopbar-capsule .cap-caret {
   font-size: 11px;
   opacity: 0.9;
+  flex: 0 0 auto;
 }
 .mtopbar-capsule:active {
   background: var(--accent-hover);
+}
+.mtopbar-capsule--style:active {
+  background: var(--gray-2);
 }
 
 /* ---------- 编辑页（§3） ---------- */

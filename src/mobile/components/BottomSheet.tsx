@@ -17,6 +17,8 @@ interface BottomSheetProps {
   open: boolean;
   onClose: () => void;
   title?: string;
+  /** 面板高度（如 '80%'）；缺省自适应 */
+  height?: string;
   children: ReactNode;
 }
 

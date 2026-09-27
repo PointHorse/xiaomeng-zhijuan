@@ -302,23 +302,23 @@ export function MobileSettingsPage({ onOpenPage }: { onOpenPage?: (p: MobilePage
       {/* ============ 外观（阶段 3 §1②：开关性质全部 Switch） ============ */}
       <Section title="外观">
         <Switch
-          icon="🌙"
+          icon="moon"
           label="深色模式"
           sub={settings.theme === 'system' ? '当前跟随系统，关闭此项后可手动选择' : undefined}
           checked={settings.theme === 'dark' || (settings.theme === 'system' && systemIsDark)}
           onChange={(next) => setSettings({ theme: next ? 'dark' : 'light' })}
         />
         <Switch
-          icon="⚙"
+          icon="settings"
           label="跟随系统"
           sub="开启后深色模式随系统自动切换"
           checked={settings.theme === 'system'}
           onChange={(next) => setSettings({ theme: next ? 'system' : resolveTheme(settings.theme) === 'dark' ? 'dark' : 'light' })}
         />
-        <SheetRow icon="🌐" sub={`当前 ${langLabel}`} onClick={() => setLangOpen(true)}>
+        <SheetRow icon="globe" sub={`当前 ${langLabel}`} onClick={() => setLangOpen(true)}>
           界面语言
         </SheetRow>
-        <SheetRow icon="🅰" sub="字号 / 行距 / 字体" onClick={() => setTypoOpen(true)}>
+        <SheetRow icon="type" sub="字号 / 行距 / 字体" onClick={() => setTypoOpen(true)}>
           字号与排版
         </SheetRow>
       </Section>
@@ -326,21 +326,21 @@ export function MobileSettingsPage({ onOpenPage }: { onOpenPage?: (p: MobilePage
       {/* ============ 体验增强（阶段 3 §1②/§2） ============ */}
       <Section title="体验增强">
         <Switch
-          icon="📳"
+          icon="vibrate"
           label="触感反馈"
           sub="主要动作时轻微震动（仅 Android 生效）"
           checked={settings.hapticsEnabled ?? true}
           onChange={(next) => setSettings({ hapticsEnabled: next })}
         />
         <Switch
-          icon="🚄"
+          icon="gauge"
           label="性能模式"
           sub="去掉毛玻璃与模糊效果，低端机更流畅"
           checked={perfMode}
           onChange={(next) => setSettings({ performanceMode: next })}
         />
         <Switch
-          icon="🌀"
+          icon="circle-slash-2"
           label="减少动画"
           sub={settings.reduceMotionOverride ? '已强制开启' : '默认跟随系统设置'}
           checked={reduceMotionActive}
@@ -353,7 +353,7 @@ export function MobileSettingsPage({ onOpenPage }: { onOpenPage?: (p: MobilePage
         {allStyles.map((s) => (
           <SheetRow
             key={s.id}
-            icon="◐"
+            icon="circle-dashed"
             selected={s.id === activeStyle?.id}
             sub={s.builtin ? '内置风格' : '自定义 · 轻点编辑'}
             onClick={() => {
@@ -382,7 +382,7 @@ export function MobileSettingsPage({ onOpenPage }: { onOpenPage?: (p: MobilePage
 
       {/* ============ 诊断（阶段 3.5 §1①） ============ */}
       <Section title="诊断">
-        <SheetRow icon="🩺" sub="最近 50 次模型请求的时间/状态码/耗时/失败原因，可复制" onClick={() => onOpenPage?.('diagnostics')}>
+        <SheetRow icon="stethoscope" sub="最近 50 次模型请求的时间/状态码/耗时/失败原因，可复制" onClick={() => onOpenPage?.('diagnostics')}>
           诊断日志
         </SheetRow>
       </Section>

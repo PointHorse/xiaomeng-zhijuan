@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { timeline } from '../worldtree/tree';
+import { Icon } from '../components/Icon';
 import { useGenerate } from '../editor/useGenerate';
 import { Button } from './components/Button';
 import { haptic } from './components/useHaptics';
@@ -161,7 +162,7 @@ export function MobileEditor() {
               <span className="mred-line" />
               <div className="mred-toolbar" data-line-fx="1">
                 <Button variant="ghost" size="sm" onClick={() => revertRed()}>
-                  ↩ 撤回
+                  <Icon name="undo-2" size={14} /> 撤回
                 </Button>
                 <Button
                   variant="secondary"
@@ -171,7 +172,7 @@ export function MobileEditor() {
                     setEditing(true);
                   }}
                 >
-                  ✎ 修改
+                  <Icon name="pencil" size={14} /> 修改
                 </Button>
                 <Button
                   variant="primary"
@@ -181,7 +182,7 @@ export function MobileEditor() {
                     void run();
                   }}
                 >
-                  ✓ 继续
+                  <Icon name="check" size={14} /> 继续
                 </Button>
               </div>
             </>
@@ -206,10 +207,10 @@ export function MobileEditor() {
                     setEditing(false);
                   }}
                 >
-                  ✓ 确认
+                  <Icon name="check" size={14} /> 确认
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
-                  ✕ 取消
+                  <Icon name="x" size={14} /> 取消
                 </Button>
               </div>
             </>
@@ -235,7 +236,7 @@ export function MobileEditor() {
         aria-label={generating ? mobileCopy.cancelGen : mobileCopy.aiContinue}
         onClick={onBallClick}
       >
-        {generating ? '✕' : '✒'}
+        <Icon name={generating ? 'x' : 'pencil'} size={20} />
       </button>
     </>
   );

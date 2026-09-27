@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { useGenerate } from '../editor/useGenerate';
 import { Button } from './components/Button';
+import { Icon } from '../components/Icon';
 import { mobileCopy } from './copy';
 
 type Snap = 'closed' | 'collapsed' | 'open' | 'expanded';
@@ -123,12 +124,12 @@ export function CandidateSheet() {
         onPointerUp={onPointerUp}
       >
         <div className="msheet-handle" style={{ margin: '0 8px 0 0' }} />
-        <div className="mcs-title">🤖 {mobileCopy.candidateTitle}</div>
+        <div className="mcs-title"><Icon name="sparkles" size={16} /> {mobileCopy.candidateTitle}</div>
         <Button variant="secondary" size="sm" disabled={generating} onClick={() => void run()}>
-          ⟳ 换一批
+          <Icon name="refresh-cw" size={14} /> 换一批
         </Button>
         <button className="mcs-close" aria-label="关闭" onClick={() => setSnap('closed')}>
-          ✕
+          <Icon name="x" size={18} />
         </button>
       </div>
 

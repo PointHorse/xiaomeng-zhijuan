@@ -7,6 +7,7 @@
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckIcon } from '../../components/Icons';
+import { Icon } from '../../components/Icon';
 
 /** 退场动画时长（--dur-slow）+ 缓冲，之后卸载 DOM */
 const CLOSE_MS = 450;
@@ -115,7 +116,11 @@ interface SheetRowProps {
 export function SheetRow({ selected, icon, sub, onClick, children }: SheetRowProps): JSX.Element {
   return (
     <button type="button" className="msheet-row2" data-line-fx="1" aria-selected={selected ?? undefined} onClick={onClick}>
-      {icon && <span aria-hidden="true">{icon}</span>}
+      {icon && (
+        <span aria-hidden="true">
+          {typeof icon === 'string' ? <Icon name={icon} size={16} /> : icon}
+        </span>
+      )}
       <span className="row-main">
         {children}
         {sub && <span className="row-sub">{sub}</span>}

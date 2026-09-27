@@ -11,6 +11,7 @@ import { Button } from './components/Button';
 import { TypographySheet } from './TypographySheet';
 import type { MobilePage } from './MobileShell';
 import { showToast } from '../components/toast';
+import { Icon } from '../components/Icon';
 import { probeModels } from '../settings/probe';
 import { saveOverride, loadOverride } from '../shelf/storyOverride';
 
@@ -122,23 +123,23 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
   return (
     <header className="mtopbar mtopbar--dual">
       <button className="micon-btn" data-line-fx="1" aria-label="新建故事" onClick={onNew}>
-        ＋
+        <Icon name="plus" size={20} />
       </button>
       <button className="micon-btn" data-line-fx="1" aria-label="书架" onClick={onOpenShelf}>
-        📚
+        <Icon name="library" size={20} />
       </button>
       <div className="mtopbar-capsules">
         <button className="mtopbar-capsule hit-44" aria-label="模型选择" onClick={() => setModelOpen(true)}>
-          <span className="cap-label">⚡ {effModel}</span>
+          <span className="cap-label">{effModel}</span>
           <span className="cap-caret">▾</span>
         </button>
         <button className="mtopbar-capsule mtopbar-capsule--style hit-44" aria-label="风格选择" onClick={() => setStyleOpen(true)}>
-          <span className="cap-label">◐ {activeStyle ? activeStyle.name : '默认'}</span>
+          <span className="cap-label">{activeStyle ? activeStyle.name : '默认'}</span>
           <span className="cap-caret">▾</span>
         </button>
       </div>
       <button className="micon-btn" data-line-fx="1" aria-label="更多" onClick={() => setMoreOpen(true)}>
-        ···
+        <Icon name="ellipsis" size={20} />
       </button>
 
       {/* ===== 模型面板（§4） ===== */}
@@ -275,7 +276,7 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
         {styles.map((s) => (
           <SheetRow
             key={s.id}
-            icon="◐"
+            icon="circle-dashed"
             selected={s.id === activeStyleId}
             onClick={() => {
               setSettings({ activeStyleId: s.id, styleSystemPrompt: (s as { systemPrompt?: string }).systemPrompt ?? '' });
@@ -288,7 +289,7 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
         ))}
         <SheetSep />
         <SheetRow
-          icon="＋"
+          icon="plus"
           sub="名称 / 源文章 / 提示词在设置页管理"
           onClick={() => {
             setStyleOpen(false);
@@ -329,7 +330,7 @@ function MoreMenu({
   return (
     <>
       <SheetRow
-        icon="💾"
+        icon="save"
         onClick={() => {
           void import('../shelf/saveNow').then((m) => m.saveNowToShelf());
           onClose();
@@ -338,7 +339,7 @@ function MoreMenu({
         保存
       </SheetRow>
       <SheetRow
-        icon="🅰"
+        icon="type"
         onClick={() => {
           onTypography();
           onClose();
@@ -347,7 +348,7 @@ function MoreMenu({
         字号与排版
       </SheetRow>
       <SheetRow
-        icon={isDark ? '☀' : '🌙'}
+        icon={isDark ? 'sun' : 'moon'}
         sub={isDark ? '当前深色' : '当前浅色'}
         onClick={() => {
           const next = isDark ? 'light' : 'dark';
@@ -360,7 +361,7 @@ function MoreMenu({
       </SheetRow>
       <SheetSep />
       <SheetRow
-        icon="🌳"
+        icon="tree-deciduous"
         onClick={() => {
           onOpenPage('worldtree');
           onClose();
@@ -369,7 +370,7 @@ function MoreMenu({
         平行世界树
       </SheetRow>
       <SheetRow
-        icon="📊"
+        icon="bar-chart-3"
         onClick={() => {
           onOpenPage('dashboard');
           onClose();
@@ -378,7 +379,7 @@ function MoreMenu({
         仪表盘
       </SheetRow>
       <SheetRow
-        icon="⚡"
+        icon="zap"
         onClick={() => {
           onModel();
           onClose();
@@ -387,7 +388,7 @@ function MoreMenu({
         模型设置
       </SheetRow>
       <SheetRow
-        icon="🖼"
+        icon="image"
         onClick={() => {
           void import('../export/shareImage').then(async (m) => {
             const s = useStore.getState();
@@ -405,7 +406,7 @@ function MoreMenu({
       </SheetRow>
       <SheetSep />
       <SheetRow
-        icon="⚙"
+        icon="settings"
         onClick={() => {
           onOpenPage('settings');
           onClose();

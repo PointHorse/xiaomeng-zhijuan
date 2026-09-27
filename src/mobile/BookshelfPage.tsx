@@ -20,6 +20,7 @@ import { writeExportFile } from '../store/persist';
 import { showToast } from '../components/toast';
 import { BottomSheet, SheetRow, SheetSep } from './components/BottomSheet';
 import { Button } from './components/Button';
+import { Icon } from '../components/Icon';
 import { mobileCopy } from './copy';
 
 interface Props {
@@ -153,7 +154,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
       {/* 书架专属顶栏（§5） */}
       <header className="mtopbar">
         <button className="micon-btn" aria-label="返回" onClick={onBack}>
-          ←
+          <Icon name="undo-2" size={20} />
         </button>
         {multi ? (
           <>
@@ -172,10 +173,10 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
           <>
             <div className="mtopbar-center">{mobileCopy.shelfTitle}</div>
             <button className="micon-btn" aria-label="多选" onClick={() => setMulti(true)}>
-              ☑
+              <Icon name="check" size={20} />
             </button>
             <button className="micon-btn" aria-label="新建" onClick={onNew}>
-              ＋
+              <Icon name="plus" size={20} />
             </button>
           </>
         )}
@@ -219,7 +220,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
                 <span>{formatDate(s.updatedAt)}</span>
                 <span>{mobileCopy.charCount.replace('{n}', String(charCountOf(s.treeJson)))}</span>
                 {s.folderId && (
-                  <span>📁 {folders.find((f) => f.id === s.folderId)?.name ?? mobileCopy.noFolder}</span>
+                  <span>{folders.find((f) => f.id === s.folderId)?.name ?? mobileCopy.noFolder}</span>
                 )}
               </div>
             </div>
@@ -232,7 +233,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
                   setActionTarget(s);
                 }}
               >
-                ⋯
+                <Icon name="ellipsis" size={18} />
               </button>
             )}
           </div>
@@ -248,7 +249,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
             disabledReason={checked.size === 0 ? '请先勾选要删除的故事' : undefined}
             onClick={() => setConfirmDelete(true)}
           >
-            🗑 删除
+            <Icon name="trash-2" size={16} /> 删除
           </Button>
           <Button
             variant="secondary"
@@ -259,7 +260,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
               setMovingTarget(first ?? null);
             }}
           >
-            📁 {mobileCopy.moveToFolder}
+            <Icon name="folder-down" size={16} /> {mobileCopy.moveToFolder}
           </Button>
         </div>
       )}
@@ -297,7 +298,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
               {mobileCopy.export} TXT
             </SheetRow>
             <SheetRow
-              icon="⚡"
+              icon="zap"
               onClick={() => {
                 void import('../shelf/storyOverride').then(async (m) => {
                   const ov = await m.loadOverride(actionTarget.id);
@@ -317,7 +318,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
             </SheetRow>
             <SheetSep />
             <SheetRow
-              icon="📁"
+              icon="folder-down"
               onClick={() => {
                 setMovingTarget(actionTarget);
                 setActionTarget(null);
@@ -326,7 +327,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
               {mobileCopy.moveToFolder}
             </SheetRow>
             <SheetRow
-              icon="🗑"
+              icon="trash-2"
               onClick={() => {
                 setChecked(new Set([actionTarget.id]));
                 setActionTarget(null);
@@ -391,7 +392,7 @@ export function BookshelfPage({ onBack, onOpen, onNew, currentId }: Props) {
         {folders.map((f) => (
           <SheetRow
             key={f.id}
-            icon="📁"
+            icon="folder-down"
             onClick={() => {
               const ids = multi ? [...checked] : movingTarget ? [movingTarget.id] : [];
               void Promise.all(ids.map((id) => setStoryFolder(id, f.id))).then(() => refresh());

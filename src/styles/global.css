@@ -1088,3 +1088,11 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* 图标组件（阶段 3.5 §5）：跟随字号与主题色 */
+.micon { flex: 0 0 auto; }
+.micon svg { width: 100%; height: 100%; display: block; }
+.micon--missing::before {
+  content: '·';
+  color: var(--sub);
+}

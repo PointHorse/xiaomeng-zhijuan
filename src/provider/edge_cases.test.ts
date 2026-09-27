@@ -62,7 +62,7 @@ afterEach(() => {
 });
 
 describe('边界场景：空 content 与截断', () => {
-  it('全程空 content：onDone 为空串（上层空正文防护负责重试）', async () => {
+  it('全程空 content：直接 onError 并给出明确原因（阶段 3.5 §1②）', async () => {
     fetchMock.mockResolvedValueOnce(
       sse(['data: {"choices":[{"delta":{"content":""}}]}\n\n', 'data: [DONE]\n\n']),
     );
@@ -73,7 +73,8 @@ describe('边界场景：空 content 与截断', () => {
       handlers: c.handlers,
       signal: new AbortController().signal,
     });
-    expect(c.errors).toHaveLength(0);
+    expect(c.errors).toHaveLength(1);
+    expect(c.errors[0]).toContain('未返回正文');
     expect(c.done).toBe('');
   });
 

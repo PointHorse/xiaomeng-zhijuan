@@ -56,6 +56,7 @@ ${INSTRUCTION}`
           maxTokens: s.settings.maxTokens,
         },
         onDelta: (_index, d) => useStore.getState().appendStream(d),
+        onReasoningDelta: (_index, total) => useStore.getState().appendReasoning(total),
         signal: ac.signal,
       });
       useStore.getState().finishGenerate(candidates);

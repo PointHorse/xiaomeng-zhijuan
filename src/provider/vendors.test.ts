@@ -159,7 +159,8 @@ describe('多厂商 OpenAI 兼容契约（mock fetch，走真实 openai.ts）', 
         },
         signal: new AbortController().signal,
       });
-      expect(acc.errors).toHaveLength(0);
+      expect(acc.errors).toHaveLength(v.expectText === '' ? 1 : 0);
+      if (v.expectText === '') expect(acc.errors[0]).toContain('未返回正文');
       expect(acc.done).toBe(v.expectText);
       // 请求必须打到 /chat/completions 且带 stream
       const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];

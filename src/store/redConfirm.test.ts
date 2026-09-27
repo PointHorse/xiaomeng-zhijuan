@@ -14,7 +14,7 @@ function seedWithAiNode(text: string): void {
   useStore.setState({
     storyId: 's1',
     tree: { ...tree },
-    gen: { phase: 'idle', streamText: '', errorMessage: '' },
+    gen: { phase: 'idle', streamText: '', errorMessage: '', reasoningChars: 0 },
   });
 }
 
@@ -38,7 +38,7 @@ describe('保留/确认：AI 节点转为已采纳正文', () => {
     useStore.setState({
       storyId: 's2',
       tree: createTree('开头。'),
-      gen: { phase: 'idle', streamText: '', errorMessage: '' },
+      gen: { phase: 'idle', streamText: '', errorMessage: '', reasoningChars: 0 },
     });
     useStore.getState().confirmEditedText('用户手写段。');
     const node = currentNode(useStore.getState().tree)!;

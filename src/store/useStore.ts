@@ -30,6 +30,8 @@ export interface GenState {
   /** 流式中的第一条候选文本（正文红色区渲染） */
   streamText: string;
   errorMessage: string;
+  /** 推理模型已思考字数（阶段 3.5 §1②） */
+  reasoningChars: number;
 }
 
 export interface AppState {
@@ -67,6 +69,8 @@ export interface AppState {
   /** 开始生成（进入流式状态） */
   beginGenerate: () => void;
   appendStream: (delta: string) => void;
+  /** 推理模型思考中：更新已思考字数（阶段 3.5） */
+  appendReasoning: (chars: number) => void;
   /** 完成一轮：写入候选树（candidates 全量 + 选中第一条） */
   finishGenerate: (candidates: Candidate[]) => void;
   failGenerate: (message: string) => void;
@@ -84,7 +88,7 @@ export interface AppState {
 }
 
 function freshGen(): GenState {
-  return { phase: 'idle', streamText: '', errorMessage: '' };
+  return { phase: 'idle', streamText: '', errorMessage: '', reasoningChars: 0 };
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -143,7 +147,7 @@ export const useStore = create<AppState>((set, get) => ({
   setView: (view) => set({ view }),
   markSaved: () => set({ lastSavedAt: Date.now() }),
 
-  beginGenerate: () => set({ gen: { phase: 'generating', streamText: '', errorMessage: '' }, candidates: [], redConfirmed: false }),
+  beginGenerate: () => set({ gen: { phase: 'generating', streamText: '', errorMessage: '', reasoningChars: 0 }, candidates: [], redConfirmed: false }),
   keepRed: () => {
     const t = get().tree;
     const node = currentNode(t);
@@ -152,12 +156,13 @@ export const useStore = create<AppState>((set, get) => ({
     set({ tree: { ...t }, redConfirmed: true });
   },
   appendStream: (delta) => set({ gen: { ...get().gen, streamText: get().gen.streamText + delta } }),
+  appendReasoning: (chars) => set({ gen: { ...get().gen, reasoningChars: chars } }),
   finishGenerate: (candidates) => {
     const t = get().tree;
     growWithCandidates(t, candidates, 0);
     set({ tree: { ...t }, gen: freshGen(), candidates });
   },
-  failGenerate: (message) => set({ gen: { phase: 'error', streamText: '', errorMessage: message } }),
+  failGenerate: (message) => set({ gen: { phase: 'error', streamText: '', errorMessage: message, reasoningChars: 0 } }),
 
   confirmEditedText: (text) => {
     const t = get().tree;

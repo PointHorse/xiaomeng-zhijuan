@@ -28,6 +28,8 @@ export interface StreamHandlers {
   /** 正常结束（拿到完整文本） */
   onDone: (fullText: string) => void;
   onError: (message: string) => void;
+  /** 推理模型：收到 reasoning_content 增量（参数为累计字数），UI 显示"正在思考" */
+  onReasoningDelta?: (totalChars: number) => void;
 }
 
 export interface GenRequest {

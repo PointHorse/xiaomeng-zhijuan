@@ -22,6 +22,8 @@ export interface GenerateCandidatesOptions {
   onCandidate?: (p: CandidateProgress) => void;
   /** 流式增量回调（index, delta）；仅第一条用于正文流式渲染 */
   onDelta?: (index: number, delta: string) => void;
+  /** 推理模型思考中：仅第一条候选回调（参数=累计字数） */
+  onReasoningDelta?: (index: number, totalChars: number) => void;
   signal: AbortSignal;
 }
 
@@ -49,6 +51,7 @@ async function runOne(
   params: GenParams,
   signal: AbortSignal,
   onDelta?: (delta: string) => void,
+  onReasoningDelta?: (totalChars: number) => void,
 ): Promise<RunResult> {
   for (let attempt = 0; attempt < 2; attempt++) {
     if (signal.aborted) return { index, ok: false, error: '已取消' };
@@ -65,6 +68,10 @@ async function runOne(
             text += d;
             onDelta?.(d);
           },
+          onReasoningDelta: (total) => {
+            onReasoningDelta?.(total);
+          },
+
           // 契约：onDone 携带全文；若 provider 未走流式，以此为准
           onDone: (full) => {
             if (!text) text = full;
@@ -115,6 +122,7 @@ export async function generateCandidates(
       opts.params,
       opts.signal,
       i === 0 && opts.onDelta ? (d: string) => opts.onDelta?.(i, d) : undefined,
+      i === 0 && opts.onReasoningDelta ? (total: number) => opts.onReasoningDelta?.(i, total) : undefined,
     ),
   );
 

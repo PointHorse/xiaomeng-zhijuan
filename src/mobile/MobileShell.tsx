@@ -11,11 +11,12 @@ import { BookshelfPage } from './BookshelfPage';
 import { WorldTreeCanvas } from '../worldtree/WorldTreeCanvas';
 import { MobileDashboardPage } from './MobileDashboardPage';
 import { MobileSettingsPage } from './MobileSettingsPage';
+import { MobileDiagnosticsPage } from './MobileDiagnosticsPage';
 import { usePerfPreferences } from './platform';
 import './tokens.css';
 import './mobile.css';
 
-export type MobilePage = 'editor' | 'shelf' | 'worldtree' | 'dashboard' | 'settings';
+export type MobilePage = 'editor' | 'shelf' | 'worldtree' | 'dashboard' | 'settings' | 'diagnostics';
 
 export function MobileShell() {
   const [page, setPage] = useState<MobilePage>('editor');
@@ -53,8 +54,8 @@ export function MobileShell() {
     );
   }
 
-  if (page === 'worldtree' || page === 'dashboard' || page === 'settings') {
-    const titleMap = { worldtree: '平行世界树', dashboard: '仪表盘', settings: '设置' } as const;
+  if (page === 'worldtree' || page === 'dashboard' || page === 'settings' || page === 'diagnostics') {
+    const titleMap = { worldtree: '平行世界树', dashboard: '仪表盘', settings: '设置', diagnostics: '诊断日志' } as const;
     return (
       <div className="mshell">
         <div className="msubpage-head">
@@ -66,7 +67,8 @@ export function MobileShell() {
         <div className="msubpage-body msubpage-canvas-host">
           {page === 'worldtree' && <WorldTreeCanvas />}
           {page === 'dashboard' && <MobileDashboardPage />}
-          {page === 'settings' && <MobileSettingsPage />}
+          {page === 'settings' && <MobileSettingsPage onOpenPage={(p) => setPage(p)} />}
+          {page === 'diagnostics' && <MobileDiagnosticsPage />}
         </div>
       </div>
     );

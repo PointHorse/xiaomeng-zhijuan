@@ -49,6 +49,8 @@ export function MobileEditor() {
 
   const generating = gen.phase === 'generating';
   const phase = genLoadingPhase(generating, gen.streamText);
+  // 推理模型思考中：骨架屏保持可见（正文未开始时 reasoning 已在流动）
+  void phase;
 
   // 正文 textarea 自适应内容高度
   useEffect(() => {
@@ -120,7 +122,7 @@ export function MobileEditor() {
             spellCheck={false}
           />
 
-          {/* 生成中：模糊占位（扫光）→ 流式红字渐显 */}
+          {/* 生成中：模糊占位（扫光）→ 思考中（推理模型）→ 流式红字渐显 */}
           {generating && (
             <div className="mgen-area">
               {phase !== 'idle' && (
@@ -132,6 +134,13 @@ export function MobileEditor() {
                   <div className="skel-line" />
                   <div className="skel-line" />
                   <div className="skel-line" style={{ width: '55%' }} />
+                </div>
+              )}
+              {/* 推理模型思考中：reasoning 已到达但正文未开始 */}
+              {gen.reasoningChars > 0 && !gen.streamText && (
+                <div className="mthinking" role="status">
+                  <span className="mthinking-dot" />
+                  模型正在思考… 已思考 {gen.reasoningChars} 字
                 </div>
               )}
               {phase === 'resolving' && (

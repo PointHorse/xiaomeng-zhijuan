@@ -18,6 +18,7 @@ import { Switch } from './components/Switch';
 import { Slider } from './components/Slider';
 import { TypographySheet } from './TypographySheet';
 import { usePerfPreferences } from './platform';
+import type { MobilePage } from './MobileShell';
 
 type AnalysisPhase = 'idle' | 'analyzing' | 'done' | 'error';
 
@@ -41,7 +42,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export function MobileSettingsPage(): JSX.Element {
+export function MobileSettingsPage({ onOpenPage }: { onOpenPage?: (p: MobilePage) => void }): JSX.Element {
   const settings = useStore((s) => s.settings);
   const setSettings = useStore((s) => s.setSettings);
   const { lang, setLang } = useI18n();
@@ -377,6 +378,13 @@ export function MobileSettingsPage(): JSX.Element {
             </Button>
           )}
         </div>
+      </Section>
+
+      {/* ============ 诊断（阶段 3.5 §1①） ============ */}
+      <Section title="诊断">
+        <SheetRow icon="🩺" sub="最近 50 次模型请求的时间/状态码/耗时/失败原因，可复制" onClick={() => onOpenPage?.('diagnostics')}>
+          诊断日志
+        </SheetRow>
       </Section>
 
       {/* ============ Sheets ============ */}

@@ -9,6 +9,10 @@ export interface SseEvent {
   delta: string;
   /** 是否为流结束标记（data: [DONE]） */
   done: boolean;
+  /** 推理模型：reasoning_content 增量（诊断与"思考中"UI 用） */
+  reasoningDelta?: string;
+  /** 上游给出的 finish_reason（出现于最后一个 chunk） */
+  finishReason?: string | null;
 }
 
 export interface SseState {
@@ -45,6 +49,36 @@ function extractDelta(json: string): string {
   }
 }
 
+/** 提取推理模型 reasoning_content 增量（DeepSeek / glm 等思考阶段） */
+function extractReasoningDelta(json: string): string {
+  try {
+    const obj = JSON.parse(json) as Record<string, unknown>;
+    const choices = obj.choices as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(choices) && choices.length > 0) {
+      const delta = choices[0].delta as Record<string, unknown> | undefined;
+      if (delta && typeof delta.reasoning_content === 'string') return delta.reasoning_content;
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+/** 提取 finish_reason（最后一个非空 chunk 携带） */
+function extractFinishReason(json: string): string | null {
+  try {
+    const obj = JSON.parse(json) as Record<string, unknown>;
+    const choices = obj.choices as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(choices) && choices.length > 0) {
+      const fr = choices[0].finish_reason;
+      if (typeof fr === 'string') return fr;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * 喂入新到达的文本块，返回解析出的 SSE 事件序列。
  * 不完整的行会留在 buffer 中等待下一次喂入。
@@ -74,7 +108,11 @@ export function feedSse(state: SseState, chunk: string): SseEvent[] {
       continue;
     }
     const delta = extractDelta(payload);
-    if (delta) events.push({ delta, done: false });
+    const reasoningDelta = extractReasoningDelta(payload);
+    const finishReason = extractFinishReason(payload);
+    if (delta || reasoningDelta || finishReason !== null) {
+      events.push({ delta, done: false, reasoningDelta: reasoningDelta || undefined, finishReason });
+    }
   }
   return events;
 }

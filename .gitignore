@@ -10,6 +10,7 @@ coverage/
 *.exe
 *.zip
 *.msi
+release/
 
 # 模型与数据集（绝不入库）
 *.gguf

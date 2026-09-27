@@ -36,12 +36,17 @@ export function useIsMobile(): boolean {
   return mobile;
 }
 
-/** 低性能设备判定：核数或内存过小（阶段 3 §2）。纯函数可测。 */
+/**
+ * 低性能设备判定（阶段 3.5 §3 收紧）：核数与内存**同时**过低才判定。
+ * 理由：CSS blur/玻璃在真机 GPU 上是合成器路径，中端机（6 核/6GB）完全可承载；
+ * 旧版「或」条件会把 8 核 4GB 的普通手机误判（deviceMemory 在部分 WebView 上报偏低）。
+ * 模拟器/software rendering 不在此判定内——用户可手动开启性能模式。
+ */
 export function isLowPerfDevice(nav: Navigator = navigator): boolean {
   const n = nav as Navigator & { deviceMemory?: number };
   const cores = nav.hardwareConcurrency ?? 8;
   const mem = n.deviceMemory ?? 8;
-  return cores <= 4 || mem <= 4;
+  return cores <= 4 && mem <= 4;
 }
 
 export interface PerfPreferences {

@@ -218,6 +218,43 @@ h2 .tag {
 }
 .ai-ball:active { transform: scale(0.92); background: var(--brand-strong); }
 
+/* ===== §6 点击反馈演示样式 ===== */
+* { -webkit-tap-highlight-color: transparent; }
+.m-btn--primary { position: relative; overflow: hidden; }
+.m-btn--primary .ring-demo {
+  position: absolute; inset: 3px;
+  width: calc(100% - 6px); height: calc(100% - 6px);
+  pointer-events: none;
+}
+.m-btn--primary .ring-demo rect {
+  width: 100%; height: 100%;
+  fill: none; stroke: #fff; stroke-width: 1.5;
+  stroke-dasharray: 100; stroke-dashoffset: 100;
+  vector-effect: non-scaling-stroke;
+  animation: ring-run 350ms var(--ease-standard) forwards;
+}
+@keyframes ring-run {
+  0% { stroke-dashoffset: 100; opacity: 1; }
+  75% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+[data-line-fx] { position: relative; }
+[data-line-fx]::after {
+  content: ''; position: absolute; bottom: 2px; left: 50%;
+  transform: translateX(-50%); width: 0; height: 2px;
+  border-radius: 1px; background: var(--gray-5); opacity: 0; pointer-events: none;
+}
+[data-line-fx].line-fx-run::after { animation: line-expand 350ms var(--ease-standard); }
+@keyframes line-expand {
+  0% { width: 0; opacity: 1; }
+  60% { width: 68%; opacity: 1; }
+  100% { width: 68%; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-btn--primary .ring-demo rect { animation: none; opacity: 0; }
+  [data-line-fx].line-fx-run::after { animation: none; opacity: 0; }
+}
+
 /* ===== §5 世界树画布原型样式（全部令牌化） ===== */
 #wc-wrap {
   position: relative;
@@ -436,6 +473,25 @@ footer { margin-top: var(--sp-8); font-size: var(--fs-xs); color: var(--gray-3);
     </div>
   </section>
 
+  <!-- ============ §6 点击反馈 ============ -->
+  <section id="feedback-demo">
+    <h2>5 · 点击反馈<span class="tag">胶囊描边环（主操作）· 底部线条展开（列表与次操作）· 无系统高亮</span></h2>
+    <p class="note">
+      珊瑚红胶囊：点击后内侧 3px 处一条 1.5px 白线从一点绕行一周（350ms）后淡出（SVG stroke-dashoffset）。
+      列表项/图标钮/次操作：底部中央 2px 线条向两侧展开后淡出（Peroxide 导航指示），颜色跟随正文色。
+      系统点击高亮已全局移除；焦点轮廓仅键盘操作时显示（:focus-visible）。减少动画时两者退化为淡入淡出。
+    </p>
+    <div class="btn-row">
+      <button class="m-btn m-btn--primary" data-ring-demo>开始续写（点我看出环）</button>
+      <button class="m-btn m-btn--secondary" data-line-fx="1">打开书架</button>
+      <button class="m-btn m-btn--ghost" data-line-fx="1">预览长图</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-2)">
+      <button class="row" data-line-fx="1" style="position: relative; border: 1px solid var(--gray-2); border-radius: var(--radius-sm); min-height: 48px; background: transparent; color: var(--gray-5); font: inherit; cursor: pointer;">◐ 脑洞大开（列表行 · 底部线条）</button>
+      <button class="row" data-line-fx="1" style="position: relative; border: 1px solid var(--gray-2); border-radius: var(--radius-sm); min-height: 48px; background: transparent; color: var(--gray-5); font: inherit; cursor: pointer;">◐ 简练克制（列表行 · 底部线条）</button>
+    </div>
+  </section>
+
   <footer>
     令牌细节见 docs/design-language.md · 动效原则：弹性只用于浮层召唤（≤400ms），循环动画用线性 + 错相位，仅动 transform/opacity/background-position。
   </footer>
@@ -550,6 +606,36 @@ simBtn.addEventListener('click', function () {
     }
   }, 55);
 });
+</script>
+
+<script>
+/* ================= §6 点击反馈演示 ================= */
+(function () {
+  // 胶囊描边环：每次点击重挂 SVG 以重启动画
+  var ringBtn = document.querySelector('[data-ring-demo]');
+  if (ringBtn) {
+    ringBtn.addEventListener('click', function () {
+      var old = ringBtn.querySelector('.ring-demo');
+      if (old) old.remove();
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'ring-demo');
+      svg.setAttribute('viewBox', '0 0 100 100');
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.innerHTML = '<rect pathLength="100" />';
+      ringBtn.appendChild(svg);
+    });
+  }
+  // 底部线条：委托 click，重启动画类
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var el = t.closest('[data-line-fx]');
+    if (!el) return;
+    el.classList.remove('line-fx-run');
+    void el.offsetWidth;
+    el.classList.add('line-fx-run');
+  });
+})();
 </script>
 
 <script>

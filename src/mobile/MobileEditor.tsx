@@ -159,7 +159,7 @@ export function MobileEditor() {
                 {redNode.text}
               </span>
               <span className="mred-line" />
-              <div className="mred-toolbar">
+              <div className="mred-toolbar" data-line-fx="1">
                 <Button variant="ghost" size="sm" onClick={() => revertRed()}>
                   ↩ 撤回
                 </Button>
@@ -197,7 +197,7 @@ export function MobileEditor() {
                 onChange={(e) => setEditValue(e.target.value)}
                 autoFocus
               />
-              <div className="mred-toolbar">
+              <div className="mred-toolbar" data-line-fx="1">
                 <Button
                   variant="primary"
                   size="sm"

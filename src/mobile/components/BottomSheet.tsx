@@ -114,7 +114,7 @@ interface SheetRowProps {
 
 export function SheetRow({ selected, icon, sub, onClick, children }: SheetRowProps): JSX.Element {
   return (
-    <button type="button" className="msheet-row2" aria-selected={selected ?? undefined} onClick={onClick}>
+    <button type="button" className="msheet-row2" data-line-fx="1" aria-selected={selected ?? undefined} onClick={onClick}>
       {icon && <span aria-hidden="true">{icon}</span>}
       <span className="row-main">
         {children}

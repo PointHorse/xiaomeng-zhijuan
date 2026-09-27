@@ -121,10 +121,10 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
 
   return (
     <header className="mtopbar mtopbar--dual">
-      <button className="micon-btn" aria-label="新建故事" onClick={onNew}>
+      <button className="micon-btn" data-line-fx="1" aria-label="新建故事" onClick={onNew}>
         ＋
       </button>
-      <button className="micon-btn" aria-label="书架" onClick={onOpenShelf}>
+      <button className="micon-btn" data-line-fx="1" aria-label="书架" onClick={onOpenShelf}>
         📚
       </button>
       <div className="mtopbar-capsules">
@@ -137,7 +137,7 @@ export function MobileTopBar({ onNew, onOpenShelf, onOpenPage }: Props) {
           <span className="cap-caret">▾</span>
         </button>
       </div>
-      <button className="micon-btn" aria-label="更多" onClick={() => setMoreOpen(true)}>
+      <button className="micon-btn" data-line-fx="1" aria-label="更多" onClick={() => setMoreOpen(true)}>
         ···
       </button>
 

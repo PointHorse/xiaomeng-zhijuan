@@ -2,6 +2,8 @@
 
 * {
   box-sizing: border-box;
+  /* 阶段 3.5 §6：移除系统点击高亮，改用自绘反馈与 :focus-visible */
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,

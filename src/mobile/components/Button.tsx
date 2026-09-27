@@ -10,7 +10,7 @@
  * - 文案写动作本身（"保存更改"），禁用"确定/提交"类含糊词。
  * - 触控区 ≥44dp；primary 触发轻触感反馈（不可用时静默降级）。
  */
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { ButtonHTMLAttributes, ReactNode, useState } from 'react';
 import { haptic } from './useHaptics';
 import './components.css';
 
@@ -38,6 +38,7 @@ export function Button({
   children,
   ...rest
 }: ButtonProps): JSX.Element {
+  const [ringKey, setRingKey] = useState(0);
   const isDisabled = disabled || loading;
   const cls = ['m-btn', `m-btn--${variant}`, size === 'sm' ? 'm-btn--sm' : '', className ?? '']
     .filter(Boolean)
@@ -51,11 +52,20 @@ export function Button({
       disabled={isDisabled}
       onClick={(e) => {
         if (isDisabled) return;
-        if (variant === 'primary') void haptic('light');
+        // 珊瑚红胶囊描边环（阶段 3.5 §6）：内侧 3px 白线绕行 350ms 后淡出
+        if (variant === 'primary') {
+          void haptic('light');
+          setRingKey((k) => k + 1);
+        }
         void onClick?.(e);
       }}
       {...rest}
     >
+      {variant === 'primary' && ringKey > 0 && (
+        <svg key={ringKey} className="m-btn-ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="97" height="97" rx="12" ry="18" pathLength="100" />
+        </svg>
+      )}
       {loading && <span className="m-btn-spin" aria-hidden="true" />}
       <span className={loading ? 'm-btn-loading-text' : undefined}>{children}</span>
     </button>

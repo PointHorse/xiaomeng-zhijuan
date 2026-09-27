@@ -12,7 +12,9 @@ import { WorldTreeCanvas } from '../worldtree/WorldTreeCanvas';
 import { MobileDashboardPage } from './MobileDashboardPage';
 import { MobileSettingsPage } from './MobileSettingsPage';
 import { MobileDiagnosticsPage } from './MobileDiagnosticsPage';
+import { useEffect } from 'react';
 import { usePerfPreferences } from './platform';
+import { installLineFeedback } from './components/lineFeedback';
 import './tokens.css';
 import './mobile.css';
 
@@ -23,6 +25,7 @@ export function MobileShell() {
   const storyId = useStore((s) => s.storyId);
   const loadStoryAction = useStore((s) => s.loadStory);
   const perf = usePerfPreferences();
+  useEffect(() => installLineFeedback(), []);
 
   async function openStory(id: string, t: string, treeJson: string): Promise<void> {
     try {

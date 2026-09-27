@@ -67,7 +67,7 @@ export function MobileShell() {
           </button>
           <div className="msub-title">{titleMap[page]}</div>
         </div>
-        <div className="msubpage-body msubpage-canvas-host">
+        <div className={`msubpage-body ${page === 'worldtree' ? 'msubpage-canvas-host' : ''}`}>
           {page === 'worldtree' && <WorldTreeCanvas />}
           {page === 'dashboard' && <MobileDashboardPage />}
           {page === 'settings' && <MobileSettingsPage onOpenPage={(p) => setPage(p)} />}

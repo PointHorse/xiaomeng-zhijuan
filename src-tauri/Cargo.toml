@@ -1,6 +1,6 @@
 [package]
 name = "xiaomeng-zhijuan"
-version = "0.3.0"
+version = "0.3.5"
 description = "小梦织卷 — AI 小说续写桌面客户端"
 authors = ["xiaomeng"]
 edition = "2021"

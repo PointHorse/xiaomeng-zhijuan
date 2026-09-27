@@ -53,6 +53,7 @@ async function runOne(
   onDelta?: (delta: string) => void,
   onReasoningDelta?: (totalChars: number) => void,
 ): Promise<RunResult> {
+  let lastFailed: string | undefined;
   for (let attempt = 0; attempt < 2; attempt++) {
     if (signal.aborted) return { index, ok: false, error: '已取消' };
     let text = '';
@@ -92,10 +93,11 @@ async function runOne(
     } catch (e) {
       failed = e instanceof Error ? e.message : String(e);
     }
+    lastFailed = failed;
     // 重试前小退避
     await new Promise((r) => setTimeout(r, 250));
   }
-  return { index, ok: false, error: '生成失败（已重试一次）；若持续出现，请调大「最大生成长度」' };
+  return { index, ok: false, error: `生成失败（已重试一次）：${lastFailed ?? '未知原因'}` };
 }
 
 /**

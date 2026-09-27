@@ -220,7 +220,7 @@ export function MobileEditor() {
 
       {/* 错误卡片 + 重试 */}
       {!generating && gen.phase === 'error' && (
-        <div style={{ margin: '10px 0', padding: '12px 14px', background: 'var(--accent-soft)', borderRadius: 12, fontSize: 14, lineHeight: 1.8, color: 'var(--accent-text)' }}>
+        <div style={{ margin: '10px 0', padding: '12px 14px', background: 'var(--danger-tint)', border: '1px solid var(--danger)', borderRadius: 12, fontSize: 14, lineHeight: 1.8, color: 'var(--danger)' }}>
           ⚠ 生成失败：{gen.errorMessage}
           <div style={{ marginTop: 8 }}>
             <Button variant="primary" size="sm" onClick={() => void run()}>

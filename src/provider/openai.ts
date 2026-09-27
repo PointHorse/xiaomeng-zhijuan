@@ -236,7 +236,7 @@ export function createOpenAIProvider(cfg: ProviderConfig): Provider {
           consumeChunk(text);
         }
         finish();
-        verdict = `成功（${full.length} 字）`;
+        verdict = full.trim() ? `成功（${full.length} 字）` : 'HTTP 200 但正文为空';
         diagPush({
           t: Date.now(), url: `${base}/chat/completions`, model: cfg.model,
           status: res.status, verdict,
